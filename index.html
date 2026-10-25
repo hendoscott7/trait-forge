@@ -829,7 +829,7 @@ const Dice = (() => {
     W = innerWidth; H = innerHeight;
     R = Math.max(30, Math.min(48, Math.min(W, 520) * .095));
     const fl = document.querySelector(".floorline"), sb = fl ? fl.getBoundingClientRect().top : H - 30;
-    floorY = sb - R - 6;
+    floorY = sb - R + 16;
     document.documentElement.style.setProperty("--floor", Math.round(R * 2 + 76) + "px");
     renderer.setSize(W, H, false);
     camera.left = 0; camera.right = W; camera.top = 0; camera.bottom = -H; camera.updateProjectionMatrix();
