@@ -1156,15 +1156,15 @@ function graceFrame(t){
   c.globalCompositeOperation = dark ? "lighter" : "source-over";
   // a pale wash at the top, as if a window is open somewhere above
   const top = c.createLinearGradient(0, 0, 0, H * .6);
-  top.addColorStop(0, "rgba(0,0,0,0)"); top.addColorStop(.14, dark ? "rgba(255,236,190,.07)" : "rgba(255,226,160,.22)"); top.addColorStop(1, "rgba(0,0,0,0)");
+  top.addColorStop(0, "rgba(0,0,0,0)"); top.addColorStop(.14, dark ? "rgba(255,236,190,.07)" : "rgba(232,182,90,.16)"); top.addColorStop(1, "rgba(0,0,0,0)");
   c.fillStyle = top; c.fillRect(0, 0, W, H);
   // shafts of light, slanting and slowly shifting; soft edges from stacked layers
   beams.forEach(b => {
     const breathe = b.k * (.75 + .25 * Math.sin(s * b.sp * 2 + b.ph)), cx = (b.x + Math.sin(s * b.sp + b.ph) * .015) * W, len = H, lean = b.tilt * len;
     for (let l = 0; l < 5; l++) {
-      const hw = W * b.w * (.35 + l * .2), a = (dark ? .016 : .045) * breathe;
+      const hw = W * b.w * (.35 + l * .2), a = (dark ? .016 : .085) * breathe;
       const g = c.createLinearGradient(0, 0, 0, len);
-      g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(.12, dark ? `rgba(255,240,205,${a})` : `rgba(255,214,130,${a})`); g.addColorStop(.7, dark ? `rgba(255,240,205,${a * .35})` : `rgba(255,214,130,${a * .35})`); g.addColorStop(1, "rgba(0,0,0,0)");
+      g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(.12, dark ? `rgba(255,240,205,${a})` : `rgba(255,250,232,${a})`); g.addColorStop(.7, dark ? `rgba(255,240,205,${a * .35})` : `rgba(255,250,232,${a * .35})`); g.addColorStop(1, "rgba(0,0,0,0)");
       c.fillStyle = g; c.beginPath();
       c.moveTo(cx - hw * .45, -2); c.lineTo(cx + hw * .45, -2); c.lineTo(cx + lean + hw, len); c.lineTo(cx + lean - hw, len); c.closePath(); c.fill();
     }
@@ -1178,10 +1178,10 @@ function graceFrame(t){
     const life = Math.min(1, m.y * 5) * Math.min(1, (1 - m.y) * 3), tw = .55 + .45 * Math.sin(s * m.tw + m.ph), a = life * lit * tw;
     if (m.glint) {   // a tiny four-point glint
       const r = m.s * 2.2 * (.6 + .4 * tw);
-      c.strokeStyle = dark ? `rgba(255,236,180,${.5 * a})` : `rgba(176,128,30,${.45 * a})`; c.lineWidth = .7;
+      c.strokeStyle = dark ? `rgba(255,236,180,${.5 * a})` : `rgba(170,120,25,${.7 * a})`; c.lineWidth = .7;
       c.beginPath(); c.moveTo(x - r, y); c.lineTo(x + r, y); c.moveTo(x, y - r); c.lineTo(x, y + r); c.stroke();
     }
-    c.fillStyle = dark ? `rgba(255,${226 + m.tone * 20 | 0},170,${.55 * a})` : `rgba(${170 + m.tone * 30 | 0},120,30,${.45 * a})`;
+    c.fillStyle = dark ? `rgba(255,${226 + m.tone * 20 | 0},170,${.55 * a})` : `rgba(${165 + m.tone * 30 | 0},112,22,${.75 * a})`;
     c.beginPath(); c.arc(x, y, m.s, 0, Math.PI * 2); c.fill();
   });
 }
