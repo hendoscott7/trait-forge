@@ -45,18 +45,17 @@ body{
   padding-right:max(calc(var(--edge) + 20px), env(safe-area-inset-right, 0px));
   -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none;
 }
-.sheet{position:fixed; top:var(--head); bottom:var(--foot); left:var(--edge); right:var(--edge); z-index:-1; pointer-events:none; background:var(--paper); border-radius:24px 18px 26px 16px / 18px 26px 16px 24px}
+.sheet{position:fixed; inset:-30vh 0; z-index:-1; pointer-events:none; background:var(--paper)}
+.floorline{position:fixed; left:0; right:0; bottom:var(--foot); height:0; pointer-events:none}
 .sheet::before{content:none}
-.sheet::after{content:""; position:absolute; inset:0; border-radius:22px; mix-blend-mode:multiply; opacity:.6;
+.sheet::after{content:""; position:absolute; inset:0; mix-blend-mode:multiply; opacity:.6;
   background-image:
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='.02 .9' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 0.5  0 0 0 0 0.47  0 0 0 0 0.42  0 0 0 1.1 -0.62'/></filter><rect width='100%' height='100%' filter='url(%23f)'/></svg>"),
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.45  0 0 0 0 0.43  0 0 0 0 0.4  0 0 0 0.9 -0.25'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"),
-    radial-gradient(120% 90% at 30% 20%, transparent 55%, rgba(120,105,85,.16) 100%)}
-.sheet .grit{position:absolute; inset:0; border-radius:22px; pointer-events:none;
+    none}
+.sheet .grit{position:absolute; inset:0; pointer-events:none;
   background-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='s'><feTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='1' seed='9' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.07  0 0 0 0 0.07  0 0 0 0 0.07  0 0 0 14 -11.6'/></filter><rect width='100%' height='100%' filter='url(%23s)'/></svg>"),
-    linear-gradient(90deg, rgba(0,0,0,.09), transparent 7%, transparent 93%, rgba(0,0,0,.12)),
-    linear-gradient(180deg, rgba(0,0,0,.06), transparent 10%, transparent 88%, rgba(0,0,0,.08))}
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='s'><feTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='1' seed='9' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.07  0 0 0 0 0.07  0 0 0 0 0.07  0 0 0 14 -11.6'/></filter><rect width='100%' height='100%' filter='url(%23s)'/></svg>")}
 :root[data-mode="dark"] .sheet::after{display:none}
 :root[data-mode="dark"] .sheet .grit{background-image:
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='s'><feTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='1' seed='9' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.32  0 0 0 0 0.31  0 0 0 0 0.29  0 0 0 14 -12.4'/></filter><rect width='100%' height='100%' filter='url(%23s)'/></svg>")}
@@ -223,7 +222,7 @@ h1{margin:0}
   <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="1" seed="3"/><feDisplacementMap in="SourceGraphic" scale="2.6"/></filter>
   <filter id="wobble"><feTurbulence type="fractalNoise" baseFrequency=".012" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="14"/></filter>
 </svg>
-<div class="sheet" aria-hidden="true"><div class="grit"></div></div>
+<div class="sheet" aria-hidden="true"><div class="grit"></div></div><div class="floorline" aria-hidden="true"></div>
 <canvas id="embers" aria-hidden="true"></canvas>
 <canvas id="dice" aria-hidden="true"></canvas>
 <canvas id="sparks" aria-hidden="true"></canvas>
@@ -824,7 +823,7 @@ const Dice = (() => {
   function layout(){
     W = innerWidth; H = innerHeight;
     R = Math.max(30, Math.min(48, Math.min(W, 520) * .095));
-    const sheet = document.querySelector(".sheet"), sb = sheet ? sheet.getBoundingClientRect().bottom : H - 10;
+    const fl = document.querySelector(".floorline"), sb = fl ? fl.getBoundingClientRect().top : H - 30;
     floorY = sb - R - 34;
     document.documentElement.style.setProperty("--floor", Math.round(R * 2 + 76) + "px");
     renderer.setSize(W, H, false);
