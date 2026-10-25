@@ -1077,7 +1077,7 @@ function fateLands(i){
 const hellCv = document.getElementById("hell"), hellCtx = hellCv.getContext("2d");
 let hellOn = false, hellRAF = 0, hellLast = 0;
 const tongues = Array.from({ length: 14 }, (_, k) => ({ x: (k + Math.random() * .8) / 14, w: .08 + Math.random() * .09, h: .35 + Math.random() * .45, ph: Math.random() * 6.28, sp: .6 + Math.random() * .8 }));
-const ash = Array.from({ length: 26 }, () => ({ x: Math.random(), y: Math.random(), v: .015 + Math.random() * .03, s: .6 + Math.random() * 1.1, ph: Math.random() * 6.28 }));
+const ash = Array.from({ length: 40 }, () => ({ x: Math.random(), y: Math.random(), v: .015 + Math.random() * .03, s: .9 + Math.random() * 1.5, ph: Math.random() * 6.28 }));
 function hellFrame(t){
   const dpr = Math.min(devicePixelRatio || 1, 1.5), W = hellCv.clientWidth, H = hellCv.clientHeight;
   if (hellCv.width !== Math.round(W * dpr)) { hellCv.width = Math.round(W * dpr); hellCv.height = Math.round(H * dpr); }
@@ -1106,7 +1106,7 @@ function hellFrame(t){
   ash.forEach(a => {
     a.y -= a.v * .016; if (a.y < 0) { a.y = 1; a.x = Math.random(); }
     const x = a.x * W + Math.sin(s * .8 + a.ph) * 10, y = a.y * H, fade = Math.min(1, a.y * 1.6) * (1 - a.y * .2);
-    c.fillStyle = dark ? `rgba(255,150,70,${.22 * fade})` : `rgba(110,35,8,${.3 * fade})`;
+    c.fillStyle = dark ? `rgba(255,160,80,${.45 * fade})` : `rgba(95,30,8,${.5 * fade})`;
     c.beginPath(); c.arc(x, y, a.s, 0, Math.PI * 2); c.fill();
   });
 }
