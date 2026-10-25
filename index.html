@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Trait Forge</title>
 <meta name="description" content="Roll three d20s. Get a belief, a habit and a flaw for your character. Nat 20s are legendary. Nat 1s are not.">
-<meta name="theme-color" content="#0a0a09">
+<meta name="theme-color" content="#252321">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Trait Forge">
 <meta property="og:title" content="Trait Forge">
@@ -36,7 +36,7 @@
   color-scheme:light;
 }
 :root[data-mode="dark"]{ --night:#0a0a09; --paper:#252321; --ink:#e9e1d1; --soft:#8b847a; --red:#8c0c06; --mute:#5f5a53; --slip:#36322c; --slipShade:rgba(0,0,0,.55); --ring:rgba(233,225,209,.17); color-scheme:dark }
-html{background:var(--night)}
+html{background:var(--paper)}
 html,body{height:100%; height:100dvh; margin:0; overflow:hidden; overscroll-behavior:none}
 body{box-sizing:border-box}
 body{
@@ -1302,6 +1302,7 @@ function impact(power){ if (power > .6) nudgeSound(); const now = performance.no
 const markBtn = document.getElementById("mark");
 function setMode(m, instant){
   document.documentElement.dataset.mode = m;
+  const tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.content = m === "dark" ? "#252321" : "#e8e4dc";
   try { localStorage.setItem("tf-mode", m); } catch (e) {}
   try { render(); } catch (e) {}
   if (Dice) Dice.paint();
