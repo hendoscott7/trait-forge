@@ -49,6 +49,8 @@ body{
 .sheet{position:fixed; inset:-30vh 0; z-index:-1; pointer-events:none; background:var(--paper)}
 /* the paper grain fades out at the top and bottom, so the page melts into the browser bars */
 .sheet{-webkit-mask-image:linear-gradient(to bottom, transparent 30vh, #000 calc(30vh + 90px), #000 calc(130vh - 90px), transparent 130vh); mask-image:linear-gradient(to bottom, transparent 30vh, #000 calc(30vh + 90px), #000 calc(130vh - 90px), transparent 130vh)}
+#hell{position:fixed; left:0; right:0; bottom:0; width:100%; height:55vh; z-index:-1; pointer-events:none; opacity:0; transition:opacity 1.2s ease}
+#hell.on{opacity:1}
 .floorline{position:fixed; left:0; right:0; bottom:var(--foot); height:0; pointer-events:none}
 .sheet::before{content:none}
 .sheet::after{content:""; position:absolute; inset:0; mix-blend-mode:multiply; opacity:.6;
@@ -229,7 +231,7 @@ h1{margin:0}
   <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="1" seed="3"/><feDisplacementMap in="SourceGraphic" scale="2.6"/></filter>
   <filter id="wobble"><feTurbulence type="fractalNoise" baseFrequency=".012" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="14"/></filter>
 </svg>
-<div class="sheet" aria-hidden="true"><div class="grit"></div></div><div class="floorline" aria-hidden="true"></div>
+<div class="sheet" aria-hidden="true"><div class="grit"></div></div><div class="floorline" aria-hidden="true"></div><canvas id="hell" aria-hidden="true"></canvas>
 <canvas id="embers" aria-hidden="true"></canvas>
 <canvas id="dice" aria-hidden="true"></canvas>
 <canvas id="sparks" aria-hidden="true"></canvas>
@@ -1071,6 +1073,54 @@ function fateLands(i){
     playFah(); nudgeSound(true);
   }
 }
+/* ---------- chaotic evil: a low, slow fire under the page ---------- */
+const hellCv = document.getElementById("hell"), hellCtx = hellCv.getContext("2d");
+let hellOn = false, hellRAF = 0, hellLast = 0;
+const tongues = Array.from({ length: 14 }, (_, k) => ({ x: (k + Math.random() * .8) / 14, w: .08 + Math.random() * .09, h: .35 + Math.random() * .45, ph: Math.random() * 6.28, sp: .6 + Math.random() * .8 }));
+const ash = Array.from({ length: 26 }, () => ({ x: Math.random(), y: Math.random(), v: .015 + Math.random() * .03, s: .6 + Math.random() * 1.1, ph: Math.random() * 6.28 }));
+function hellFrame(t){
+  const dpr = Math.min(devicePixelRatio || 1, 1.5), W = hellCv.clientWidth, H = hellCv.clientHeight;
+  if (hellCv.width !== Math.round(W * dpr)) { hellCv.width = Math.round(W * dpr); hellCv.height = Math.round(H * dpr); }
+  const dark = document.documentElement.dataset.mode === "dark", c = hellCtx, s = t / 1000;
+  c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
+  c.globalCompositeOperation = dark ? "lighter" : "multiply";
+  // a heat haze along the floor, breathing slowly
+  const breathe = .85 + .15 * Math.sin(s * .9) + .05 * Math.sin(s * 2.7);
+  const g = c.createLinearGradient(0, H, 0, 0);
+  g.addColorStop(0, dark ? `rgba(150,40,10,${.16 * breathe})` : `rgba(190,90,40,${.09 * breathe})`);
+  g.addColorStop(.5, dark ? `rgba(110,25,8,${.05 * breathe})` : `rgba(200,120,70,${.03 * breathe})`);
+  g.addColorStop(1, "rgba(0,0,0,0)");
+  c.fillStyle = dark ? g : g; c.fillRect(0, 0, W, H);
+  // soft tongues of flame, swaying, never sharp
+  tongues.forEach(f => {
+    const sway = Math.sin(s * f.sp + f.ph) * W * .02, hh = H * f.h * (.85 + .15 * Math.sin(s * f.sp * 1.7 + f.ph)), cx = f.x * W + sway, ww = W * f.w;
+    const r = c.createRadialGradient(cx, H, 0, cx, H, hh);
+    r.addColorStop(0, dark ? "rgba(255,110,30,.07)" : "rgba(170,70,20,.05)");
+    r.addColorStop(.6, dark ? "rgba(200,50,10,.025)" : "rgba(190,100,50,.018)");
+    r.addColorStop(1, "rgba(0,0,0,0)");
+    c.save(); c.translate(cx, H); c.scale(ww / hh, 1); c.translate(-cx, -H);
+    c.fillStyle = r; c.beginPath(); c.arc(cx, H, hh, Math.PI, 0); c.fill(); c.restore();
+  });
+  // a little ash drifting up
+  c.globalCompositeOperation = "source-over";
+  ash.forEach(a => {
+    a.y -= a.v * .016; if (a.y < 0) { a.y = 1; a.x = Math.random(); }
+    const x = a.x * W + Math.sin(s * .8 + a.ph) * 10, y = a.y * H, fade = Math.min(1, a.y * 1.6) * (1 - a.y * .2);
+    c.fillStyle = dark ? `rgba(255,150,70,${.22 * fade})` : `rgba(120,45,10,${.16 * fade})`;
+    c.beginPath(); c.arc(x, y, a.s, 0, Math.PI * 2); c.fill();
+  });
+}
+function hellLoop(t){
+  if (!hellOn) { hellRAF = 0; return; }
+  if (t - hellLast > 33) { hellLast = t; hellFrame(t); }   // 30fps is plenty for a slow fire
+  hellRAF = requestAnimationFrame(hellLoop);
+}
+function hellfire(on){
+  hellCv.classList.toggle("on", on);
+  if (on === hellOn) return; hellOn = on;
+  if (on) { if (reduce) hellFrame(0); else if (!hellRAF) hellRAF = requestAnimationFrame(hellLoop); }
+  else setTimeout(() => { if (!hellOn) hellCtx.clearRect(0, 0, hellCv.width, hellCv.height); }, 1300);
+}
 /* ---------- embers rising behind a nat 20 die ---------- */
 const emberCv = document.getElementById("embers"), emberCtx = emberCv.getContext("2d"), emberList = [];
 let emberOn = false, emberT = 0;
@@ -1422,6 +1472,7 @@ rollAllBtn.addEventListener("click", e => {
     mini.innerHTML = g;
     try { localStorage.setItem("tf-align", JSON.stringify(ALIGN)); } catch (e) {}
     if (Dice) Dice.paint();
+    hellfire(!!ALIGN && ALIGN.law === -1 && ALIGN.moral === -1);
   }
   let open = false, closeT = null;
   function openDrawer(){
