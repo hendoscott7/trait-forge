@@ -1352,7 +1352,7 @@ sndBtn.addEventListener("click", e => {
 showSound();
 function copyAll(){
   const text = state.map((s, i) => CATS[i][0].toUpperCase() + CATS[i].slice(1) + ": " + s.text).join("\n");
-  const ok = () => toast("Copied all");
+  const ok = () => toast("Copied All");
   const fallback = () => { const t = document.createElement("textarea"); t.value = text; t.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); ok(); } catch (err) {} t.remove(); };
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, fallback); else fallback();
 }
