@@ -71,10 +71,9 @@ body{
 .align .mini{width:25px; height:25px}
 .align:active .mini{transform:scale(.9)}
 .scrim{position:fixed; inset:-30vh 0; z-index:50; background:rgba(0,0,0,.42)}
-.drawer{position:fixed; z-index:51; left:max(var(--edge), env(safe-area-inset-left, 0px)); right:max(var(--edge), env(safe-area-inset-right, 0px)); bottom:0; max-width:520px; margin:0 auto;
-  background:var(--paper); color:var(--ink); border-radius:24px 24px 0 0; box-shadow:0 -10px 40px rgba(0,0,0,.35);
-  padding:10px 18px calc(22px + env(safe-area-inset-bottom, 0px)); display:flex; flex-direction:column; gap:14px}
-.drawer::after{content:""; position:absolute; left:0; right:0; top:calc(100% - 1px); height:30vh; background:var(--paper)}
+.drawer{position:fixed; z-index:51; left:max(var(--edge), env(safe-area-inset-left, 0px)); right:max(var(--edge), env(safe-area-inset-right, 0px)); bottom:calc(var(--edge) + env(safe-area-inset-bottom, 0px)); max-width:520px; margin:0 auto;
+  background:var(--paper); color:var(--ink); border-radius:24px; box-shadow:0 10px 40px rgba(0,0,0,.35);
+  padding:10px 18px 22px; display:flex; flex-direction:column; gap:14px}
 .grab{align-self:center; width:38px; height:4px; border-radius:2px; background:var(--ring)}
 .drawer[hidden], .scrim[hidden]{display:none}
 .dtitle{margin:0; text-align:center; font-family:"IM Fell English SC", "IM Fell English", Georgia, serif; font-weight:400; font-size:1.05rem; letter-spacing:.14em; text-transform:lowercase; color:var(--soft)}
@@ -1385,14 +1384,14 @@ rollAllBtn.addEventListener("click", e => {
   let open = false, closeT = null;
   function openDrawer(){
     if (open) return; open = true; scrim.hidden = false; drawer.hidden = false; drawer.style.transform = "";
-    if (!reduce) { drawer.animate([{ transform: "translateY(100%)" }, { transform: "none" }], { duration: 320, easing: "cubic-bezier(.2,.9,.3,1)" }); scrim.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220 }); }
+    if (!reduce) { drawer.animate([{ transform: "translateY(calc(100% + 60px))" }, { transform: "none" }], { duration: 320, easing: "cubic-bezier(.2,.9,.3,1)" }); scrim.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220 }); }
     pad.focus({ preventScroll: true });
   }
   function closeDrawer(){
     if (!open) return; open = false; clearTimeout(closeT);
     const done = () => { drawer.hidden = true; scrim.hidden = true; drawer.style.transform = ""; };
     if (reduce) return done();
-    drawer.animate([{ transform: drawer.style.transform || "none" }, { transform: "translateY(100%)" }], { duration: 240, easing: "cubic-bezier(.4,0,.8,.4)" }).onfinish = done;
+    drawer.animate([{ transform: drawer.style.transform || "none" }, { transform: "translateY(calc(100% + 60px))" }], { duration: 240, easing: "cubic-bezier(.4,0,.8,.4)" }).onfinish = done;
     scrim.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 240 });
     btn.focus({ preventScroll: true });
   }
