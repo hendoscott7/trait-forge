@@ -237,13 +237,13 @@ h1{margin:0}
   <button class="dclose" id="dclose" type="button" aria-label="Close"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M7.5 7.5l9 9M16.5 7.5l-9 9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
   <div class="chart">
     <span class="ax ax-t">good</span><span class="ax ax-b">evil</span><span class="ax ax-l">lawful</span><span class="ax ax-r">chaotic</span>
-    <div class="pad" id="pad" role="slider" tabindex="0" aria-label="Alignment" aria-valuetext="any"></div>
+    <div class="pad" id="pad" role="slider" tabindex="0" aria-label="Alignment" aria-valuetext="Any"></div>
   </div>
-  <p class="aname" id="aname">any</p>
+  <p class="aname" id="aname">Any</p>
 </section>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="flash" id="flash" aria-hidden="true"></div>
-<button class="align" id="alignBtn" type="button" aria-haspopup="dialog" aria-controls="drawer" aria-label="Alignment: any alignment">
+<button class="align" id="alignBtn" type="button" aria-haspopup="dialog" aria-controls="drawer" aria-label="Alignment: Any">
   <svg class="mini" viewBox="0 0 24 24" aria-hidden="true"></svg>
 </button>
 <button class="corner left" id="snd" type="button" aria-pressed="false" aria-label="Sound off. Turn sound on">
@@ -1370,7 +1370,7 @@ rollAllBtn.addEventListener("click", e => {
   const btn = document.getElementById("alignBtn"), mini = btn.querySelector(".mini"), drawer = document.getElementById("drawer"), scrim = document.getElementById("scrim");
   const pad = document.getElementById("pad"), aname = document.getElementById("aname");
   const LAW = { 1: "lawful", 0: "neutral", "-1": "chaotic" }, MOR = { 1: "good", 0: "neutral", "-1": "evil" };
-  const nameOf = a => !a ? "any" : (a.law === 0 && a.moral === 0 ? "true neutral" : LAW[a.law] + " " + MOR[a.moral]);
+  const nameOf = a => !a ? "Any" : (a.law === 0 && a.moral === 0 ? "true neutral" : LAW[a.law] + " " + MOR[a.moral]);
   const dots = [];
   for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
     const d = document.createElement("i"); d.style.left = (16.6 + c * 33.4) + "%"; d.style.top = (16.6 + r * 33.4) + "%";
@@ -1379,7 +1379,7 @@ rollAllBtn.addEventListener("click", e => {
   function show(){
     const name = nameOf(ALIGN);
     dots.forEach(d => d.classList.toggle("on", !!ALIGN && +d.dataset.law === ALIGN.law && +d.dataset.moral === ALIGN.moral));
-    aname.textContent = name; aname.classList.toggle("any", !ALIGN); pad.setAttribute("aria-valuetext", name);
+    aname.textContent = name; aname.classList.toggle("Any", !ALIGN); pad.setAttribute("aria-valuetext", name);
     btn.setAttribute("aria-label", "Alignment: " + name); btn.classList.toggle("set", !!ALIGN);
     let g = '<rect x="4" y="4" width="16" height="16" rx="2.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.33 4.5v15M14.67 4.5v15M4.5 9.33h15M4.5 14.67h15" stroke="currentColor" stroke-width="1.1" opacity=".4"/>';
     if (ALIGN) { const c = 1 - ALIGN.law, r = 1 - ALIGN.moral; g += '<rect x="' + (4.6 + c * 5.33) + '" y="' + (4.6 + r * 5.33) + '" width="4.13" height="4.13" rx=".8" fill="currentColor"/>'; }
