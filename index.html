@@ -37,7 +37,8 @@
 }
 :root[data-mode="dark"]{ --night:#000000; --paper:#131211; --ink:#e9e1d1; --soft:#8b847a; --red:#8c0c06; --mute:#5f5a53; --slip:#25221e; --slipShade:rgba(0,0,0,.55); --ring:rgba(233,225,209,.17); color-scheme:dark }
 html{background:var(--night)}
-html,body{height:100%}
+html,body{height:100%; margin:0; overflow:hidden; overscroll-behavior:none}
+body{box-sizing:border-box}
 body{
   background:transparent; color:var(--ink); font-family:var(--sans); touch-action:manipulation;
   padding-left:max(calc(var(--edge) + 20px), env(safe-area-inset-left, 0px));
