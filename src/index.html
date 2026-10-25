@@ -33,7 +33,7 @@
   --night:#0a0a09; --paper:#e8e4dc; --ink:#121212; --soft:#5d5952; --red:#6e0905; --mute:#9a958c; --slip:#f7f3ea; --slipShade:rgba(60,45,25,.18); --ring:rgba(18,18,18,.16);
   --display:"Bowlby One", "Arial Black", Impact, sans-serif;
   --sans:"IM Fell English", Georgia, "Times New Roman", serif;
-  --floor:150px; --edge:16px; --foot:calc(var(--edge) + 14px + env(safe-area-inset-bottom, 0px)); --head:calc(var(--edge) + env(safe-area-inset-top, 0px));
+  --floor:150px; --edge:8px; --foot:calc(var(--edge) + 14px + env(safe-area-inset-bottom, 0px)); --head:calc(var(--edge) + env(safe-area-inset-top, 0px));
   color-scheme:light;
 }
 :root[data-mode="dark"]{ --night:#0a0a09; --paper:#252321; --ink:#e9e1d1; --soft:#8b847a; --red:#8c0c06; --mute:#5f5a53; --slip:#36322c; --slipShade:rgba(0,0,0,.55); --ring:rgba(233,225,209,.17); color-scheme:dark }
@@ -42,8 +42,8 @@ html,body{height:100%; height:100dvh; margin:0; overflow:hidden; overscroll-beha
 body{box-sizing:border-box}
 body{
   background:transparent; color:var(--ink); font-family:var(--sans); touch-action:manipulation;
-  padding-left:max(calc(var(--edge) + 20px), env(safe-area-inset-left, 0px));
-  padding-right:max(calc(var(--edge) + 20px), env(safe-area-inset-right, 0px));
+  padding-left:max(calc(var(--edge) + 10px), env(safe-area-inset-left, 0px));
+  padding-right:max(calc(var(--edge) + 10px), env(safe-area-inset-right, 0px));
   -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none;
 }
 .sheet{position:fixed; inset:-30vh 0; z-index:-1; pointer-events:none; background:var(--paper)}
@@ -97,7 +97,7 @@ body{
 .ax-r{right:-6px; top:50%; transform:translate(50%, -50%) rotate(90deg)}
 .aname{margin:6px 0 0; text-align:center; font-size:1.25rem; color:var(--ink); min-height:1.4em}
 .aname.any{color:var(--soft)}
-main{box-sizing:border-box; will-change:transform; max-width:500px; min-height:100%; margin:0 auto; display:flex; flex-direction:column; padding-block:calc(var(--edge) + clamp(42px, 7.6vh, 64px)) calc(var(--floor) + var(--foot) - var(--edge) + 16px)}
+main{box-sizing:border-box; will-change:transform; max-width:500px; min-height:100%; margin:0 auto; display:flex; flex-direction:column; padding-block:calc(var(--edge) + env(safe-area-inset-top, 0px) + 50px) calc(var(--floor) + var(--foot) - var(--edge) + 16px)}
 .head{padding-top:clamp(4px, 2vh, 18px)}
 h1{margin:0}
 .mark{position:relative; display:block; width:100%; max-width:min(440px, 46vh); margin:0 auto; padding:0; border:0; background:none; cursor:pointer}
