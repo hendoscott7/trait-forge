@@ -47,6 +47,8 @@ body{
   -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none;
 }
 .sheet{position:fixed; inset:-30vh 0; z-index:-1; pointer-events:none; background:var(--paper)}
+/* the paper grain fades out at the top and bottom, so the page melts into the browser bars */
+.sheet{-webkit-mask-image:linear-gradient(to bottom, transparent 30vh, #000 calc(30vh + 90px), #000 calc(130vh - 90px), transparent 130vh); mask-image:linear-gradient(to bottom, transparent 30vh, #000 calc(30vh + 90px), #000 calc(130vh - 90px), transparent 130vh)}
 .floorline{position:fixed; left:0; right:0; bottom:var(--foot); height:0; pointer-events:none}
 .sheet::before{content:none}
 .sheet::after{content:""; position:absolute; inset:0; mix-blend-mode:multiply; opacity:.6;
