@@ -1158,11 +1158,16 @@ function graceFrame(t){
   const top = c.createLinearGradient(0, 0, 0, H * .6);
   top.addColorStop(0, "rgba(0,0,0,0)"); top.addColorStop(.14, dark ? "rgba(255,236,190,.07)" : "rgba(232,182,90,.16)"); top.addColorStop(1, "rgba(0,0,0,0)");
   c.fillStyle = top; c.fillRect(0, 0, W, H);
+  if (!dark) {   // on paper, light only shows against shade: dim the room a little, then let the shafts cut through
+    const sh = c.createLinearGradient(0, 0, 0, H);
+    sh.addColorStop(0, "rgba(0,0,0,0)"); sh.addColorStop(.12, "rgba(150,118,70,.14)"); sh.addColorStop(.55, "rgba(150,118,70,.07)"); sh.addColorStop(1, "rgba(0,0,0,0)");
+    c.globalCompositeOperation = "multiply"; c.fillStyle = sh; c.fillRect(0, 0, W, H); c.globalCompositeOperation = "source-over";
+  }
   // shafts of light, slanting and slowly shifting; soft edges from stacked layers
   beams.forEach(b => {
     const breathe = b.k * (.75 + .25 * Math.sin(s * b.sp * 2 + b.ph)), cx = (b.x + Math.sin(s * b.sp + b.ph) * .015) * W, len = H, lean = b.tilt * len;
     for (let l = 0; l < 5; l++) {
-      const hw = W * b.w * (.35 + l * .2), a = (dark ? .016 : .085) * breathe;
+      const hw = W * b.w * (.35 + l * .2), a = (dark ? .016 : .13) * breathe;
       const g = c.createLinearGradient(0, 0, 0, len);
       g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(.12, dark ? `rgba(255,240,205,${a})` : `rgba(255,250,232,${a})`); g.addColorStop(.7, dark ? `rgba(255,240,205,${a * .35})` : `rgba(255,250,232,${a * .35})`); g.addColorStop(1, "rgba(0,0,0,0)");
       c.fillStyle = g; c.beginPath();
