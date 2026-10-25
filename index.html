@@ -1048,12 +1048,10 @@ function fateLands(i){
   if (Dice) Dice.paint();
   if (!reduce) { const c = s.fate === "legend" ? "242,150,30" : "150,190,50"; rows[i].el.querySelector(".tile").animate([{ filter: "drop-shadow(0 0 0 rgba(" + c + ",0))" }, { filter: "drop-shadow(0 0 22px rgba(" + c + ",.9))", offset: .3 }, { filter: "drop-shadow(0 0 12px rgba(" + c + ",.55))" }], { duration: 900, easing: "ease-out" }); }
   if (s.fate === "legend") {
-    if (!reduce) { f.style.background = "#d8a73a"; f.animate([{ opacity: .38 }, { opacity: 0 }], { duration: 420, easing: "ease-out" }); }
     buzz([18, 50, 18, 50, 70]);
     if (Dice && !reduce) { Dice.glow(i); const p = Dice.pos(i); sparks(p.x, p.y, p.r); }
     playWow(); nudgeSound(true);
   } else {
-    if (!reduce) { f.style.background = "#4b5320"; f.animate([{ opacity: .4 }, { opacity: 0 }], { duration: 380, easing: "ease-out" }); }
     buzz(140);
     playFah(); nudgeSound(true);
   }
