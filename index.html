@@ -32,7 +32,7 @@
   --night:#0d0d0d; --paper:#e8e4dc; --ink:#121212; --soft:#5d5952; --red:#6e0905; --mute:#9a958c; --slip:#f7f3ea; --slipShade:rgba(60,45,25,.18); --ring:rgba(18,18,18,.16);
   --display:"Bowlby One", "Arial Black", Impact, sans-serif;
   --sans:"IM Fell English", Georgia, "Times New Roman", serif;
-  --floor:150px; --edge:16px;
+  --floor:150px; --edge:16px; --foot:calc(var(--edge) + 14px + env(safe-area-inset-bottom, 0px)); --head:calc(var(--edge) + env(safe-area-inset-top, 0px));
   color-scheme:light;
 }
 :root[data-mode="dark"]{ --night:#0a0a09; --paper:#252321; --ink:#e9e1d1; --soft:#8b847a; --red:#8c0c06; --mute:#5f5a53; --slip:#36322c; --slipShade:rgba(0,0,0,.55); --ring:rgba(233,225,209,.17); color-scheme:dark }
@@ -45,7 +45,7 @@ body{
   padding-right:max(calc(var(--edge) + 20px), env(safe-area-inset-right, 0px));
   -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none;
 }
-.sheet{position:fixed; inset:var(--edge); z-index:-1; pointer-events:none; background:var(--paper); border-radius:24px 18px 26px 16px / 18px 26px 16px 24px}
+.sheet{position:fixed; top:var(--head); bottom:var(--foot); left:var(--edge); right:var(--edge); z-index:-1; pointer-events:none; background:var(--paper); border-radius:24px 18px 26px 16px / 18px 26px 16px 24px}
 .sheet::before{content:none}
 .sheet::after{content:""; position:absolute; inset:0; border-radius:22px; mix-blend-mode:multiply; opacity:.6;
   background-image:
@@ -94,7 +94,7 @@ body{
 .ax-r{right:-6px; top:50%; transform:translate(50%, -50%) rotate(90deg)}
 .aname{margin:6px 0 0; text-align:center; font-size:1.25rem; color:var(--ink); min-height:1.4em}
 .aname.any{color:var(--soft)}
-main{box-sizing:border-box; will-change:transform; max-width:500px; min-height:100%; margin:0 auto; display:flex; flex-direction:column; padding-block:calc(var(--edge) + clamp(42px, 7.6vh, 64px)) calc(var(--floor) + 4px)}
+main{box-sizing:border-box; will-change:transform; max-width:500px; min-height:100%; margin:0 auto; display:flex; flex-direction:column; padding-block:calc(var(--edge) + clamp(42px, 7.6vh, 64px)) calc(var(--floor) + var(--foot) - var(--edge) + 4px)}
 .head{padding-top:clamp(4px, 2vh, 18px)}
 h1{margin:0}
 .mark{position:relative; display:block; width:100%; max-width:min(440px, 46vh); margin:0 auto; padding:0; border:0; background:none; cursor:pointer}
@@ -825,8 +825,8 @@ const Dice = (() => {
   function layout(){
     W = innerWidth; H = innerHeight;
     R = Math.max(30, Math.min(48, Math.min(W, 520) * .095));
-    const safe = parseFloat(getComputedStyle(document.documentElement).paddingBottom) || 0;
-    const edge = 10; floorY = H - safe - edge - R - 22;
+    const sheet = document.querySelector(".sheet"), sb = sheet ? sheet.getBoundingClientRect().bottom : H - 10;
+    floorY = sb - R - 22;
     document.documentElement.style.setProperty("--floor", Math.round(R * 2 + 76) + "px");
     renderer.setSize(W, H, false);
     camera.left = 0; camera.right = W; camera.top = 0; camera.bottom = -H; camera.updateProjectionMatrix();
