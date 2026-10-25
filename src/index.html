@@ -1147,39 +1147,35 @@ function hellfire(on){
 /* ---------- lawful good: a gilded halo behind the logo ---------- */
 const graceCv = document.getElementById("grace"), graceCtx = graceCv.getContext("2d");
 let graceOn = false, graceRAF = 0, graceLast = 0;
-const glints = Array.from({ length: 7 }, () => ({ a: Math.random() * 6.28, ph: Math.random() * 6.28, sp: .4 + Math.random() * .6 }));
+const mote = () => ({ x: Math.random(), y: Math.random(), v: .006 + Math.random() * .014, s: .5 + Math.random() * 1.3, ph: Math.random() * 6.28, tw: 1.5 + Math.random() * 3, glint: Math.random() < .3, tone: Math.random() });
+const motes = Array.from({ length: 30 }, mote);
 function graceFrame(t){
   const dpr = Math.min(devicePixelRatio || 1, 2), W = graceCv.clientWidth, H = graceCv.clientHeight;
   if (graceCv.width !== Math.round(W * dpr)) { graceCv.width = Math.round(W * dpr); graceCv.height = Math.round(H * dpr); }
   const dark = document.documentElement.dataset.mode === "dark", c = graceCtx, s = t / 1000;
   c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
   const m = document.getElementById("mark").getBoundingClientRect(), cv = graceCv.getBoundingClientRect();
-  const cx = m.left + m.width / 2 - cv.left, cy = m.top + m.height * .47 - cv.top, R = m.height * .62;
-  const breathe = .82 + .18 * Math.sin(s * .8);
+  const cx = m.left + m.width / 2 - cv.left, cy = m.top + m.height * .47 - cv.top, R = m.height * .58;
+  const breathe = .8 + .2 * Math.sin(s * .8);
   const gold = dark ? [214, 172, 84] : [150, 104, 22], col = a => `rgba(${gold[0]},${gold[1]},${gold[2]},${a})`;
-  // a soft warm bloom behind it all
-  const bloom = c.createRadialGradient(cx, cy, R * .2, cx, cy, R * 1.5);
-  bloom.addColorStop(0, col((dark ? .1 : .12) * breathe)); bloom.addColorStop(1, "rgba(0,0,0,0)");
+  // a soft warm glow, and one thin gilded ring
+  const bloom = c.createRadialGradient(cx, cy, R * .3, cx, cy, R * 1.4);
+  bloom.addColorStop(0, col((dark ? .09 : .1) * breathe)); bloom.addColorStop(1, "rgba(0,0,0,0)");
   c.fillStyle = bloom; c.fillRect(0, 0, W, H);
-  c.save(); c.translate(cx, cy); c.rotate(s * .035);
-  // fine rays between the rings, long and short, like a beaten-gold nimbus
-  for (let k = 0; k < 72; k++) {
-    const ang = k / 72 * Math.PI * 2, long = k % 2 === 0, r1 = R * .9, r2 = R * (long ? 1.24 : 1.1);
-    c.strokeStyle = col((long ? .3 : .2) * breathe); c.lineWidth = long ? 1.1 : .8;
-    c.beginPath(); c.moveTo(Math.cos(ang) * r1, Math.sin(ang) * r1); c.lineTo(Math.cos(ang) * r2, Math.sin(ang) * r2); c.stroke();
-  }
-  // the rings: a solid inner band and a beaded outer one
-  c.strokeStyle = col(.42 * breathe); c.lineWidth = 1.6; c.beginPath(); c.arc(0, 0, R * .9, 0, Math.PI * 2); c.stroke();
-  c.strokeStyle = col(.22 * breathe); c.lineWidth = .8; c.beginPath(); c.arc(0, 0, R * .86, 0, Math.PI * 2); c.stroke();
-  c.fillStyle = col(.34 * breathe);
-  for (let k = 0; k < 48; k++) { const ang = k / 48 * Math.PI * 2 + .03; c.beginPath(); c.arc(Math.cos(ang) * R * 1.3, Math.sin(ang) * R * 1.3, 1.1, 0, Math.PI * 2); c.fill(); }
-  c.restore();
-  // a few glints travelling round the ring
-  glints.forEach(g => {
-    const ang = g.a + s * .035, tw = Math.max(0, Math.sin(s * g.sp + g.ph)), x = cx + Math.cos(ang) * R * .9, y = cy + Math.sin(ang) * R * .9, r = 3.5 * tw;
-    if (r < .3) return;
-    c.strokeStyle = dark ? `rgba(255,236,180,${.7 * tw})` : `rgba(200,150,40,${.75 * tw})`; c.lineWidth = .8;
-    c.beginPath(); c.moveTo(x - r, y); c.lineTo(x + r, y); c.moveTo(x, y - r); c.lineTo(x, y + r); c.stroke();
+  c.strokeStyle = col(.45 * breathe); c.lineWidth = 1.5;
+  c.beginPath(); c.arc(cx, cy, R, 0, Math.PI * 2); c.stroke();
+  // fine dust drifting down
+  motes.forEach(mt => {
+    mt.y += mt.v * .016; if (mt.y > 1.02) Object.assign(mt, mote(), { y: -.02 });
+    const x = (mt.x + Math.sin(s * .35 + mt.ph) * .02) * W + Math.sin(s * 1.3 + mt.ph * 3) * 3, y = mt.y * H;
+    const life = Math.min(1, mt.y * 5) * Math.min(1, (1 - mt.y) * 3), tw = .55 + .45 * Math.sin(s * mt.tw + mt.ph), a = life * tw * .7;
+    if (mt.glint) {
+      const r = mt.s * 2.2 * (.6 + .4 * tw);
+      c.strokeStyle = dark ? `rgba(255,236,180,${.5 * a})` : `rgba(170,120,25,${.6 * a})`; c.lineWidth = .7;
+      c.beginPath(); c.moveTo(x - r, y); c.lineTo(x + r, y); c.moveTo(x, y - r); c.lineTo(x, y + r); c.stroke();
+    }
+    c.fillStyle = dark ? `rgba(255,${226 + mt.tone * 20 | 0},170,${.55 * a})` : `rgba(${165 + mt.tone * 30 | 0},112,22,${.7 * a})`;
+    c.beginPath(); c.arc(x, y, mt.s, 0, Math.PI * 2); c.fill();
   });
 }
 function graceLoop(t){
