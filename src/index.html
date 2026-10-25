@@ -54,6 +54,7 @@ body{
 #hell{-webkit-mask-image:linear-gradient(to top, transparent 0, #000 110px); mask-image:linear-gradient(to top, transparent 0, #000 110px)}
 #grace{position:fixed; left:0; right:0; top:0; width:100%; height:75vh; z-index:-1; pointer-events:none; opacity:0; transition:opacity 1.2s ease}
 #grace.on{opacity:1}
+#grace{-webkit-mask-image:linear-gradient(to bottom, transparent 0, #000 60px); mask-image:linear-gradient(to bottom, transparent 0, #000 60px)}
 .floorline{position:fixed; left:0; right:0; bottom:var(--foot); height:0; pointer-events:none}
 .sheet::before{content:none}
 .sheet::after{content:""; position:absolute; inset:0; mix-blend-mode:multiply; opacity:.6;
@@ -1143,52 +1144,42 @@ function hellfire(on){
   if (on) { if (reduce) hellFrame(0); else if (!hellRAF) hellRAF = requestAnimationFrame(hellLoop); }
   else setTimeout(() => { if (!hellOn) hellCtx.clearRect(0, 0, hellCv.width, hellCv.height); }, 1300);
 }
-/* ---------- lawful good: light falling from above, dust drifting in it ---------- */
+/* ---------- lawful good: a gilded halo behind the logo ---------- */
 const graceCv = document.getElementById("grace"), graceCtx = graceCv.getContext("2d");
 let graceOn = false, graceRAF = 0, graceLast = 0;
-const beams = Array.from({ length: 5 }, (_, k) => ({ x: .08 + k * .21 + (Math.random() - .5) * .08, w: .07 + Math.random() * .08, tilt: .16 + Math.random() * .1, ph: Math.random() * 6.28, sp: .15 + Math.random() * .2, k: .6 + Math.random() * .4 }));
-const mote = () => ({ x: Math.random(), y: Math.random(), v: .006 + Math.random() * .014, s: .5 + Math.random() * 1.3, ph: Math.random() * 6.28, tw: 1.5 + Math.random() * 3, glint: Math.random() < .3, tone: Math.random() });
-const motes = Array.from({ length: 34 }, mote);
+const glints = Array.from({ length: 7 }, () => ({ a: Math.random() * 6.28, ph: Math.random() * 6.28, sp: .4 + Math.random() * .6 }));
 function graceFrame(t){
-  const dpr = Math.min(devicePixelRatio || 1, 1.5), W = graceCv.clientWidth, H = graceCv.clientHeight;
+  const dpr = Math.min(devicePixelRatio || 1, 2), W = graceCv.clientWidth, H = graceCv.clientHeight;
   if (graceCv.width !== Math.round(W * dpr)) { graceCv.width = Math.round(W * dpr); graceCv.height = Math.round(H * dpr); }
   const dark = document.documentElement.dataset.mode === "dark", c = graceCtx, s = t / 1000;
   c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
-  c.globalCompositeOperation = dark ? "lighter" : "source-over";
-  // a pale wash at the top, as if a window is open somewhere above
-  const top = c.createLinearGradient(0, 0, 0, H * .6);
-  top.addColorStop(0, "rgba(0,0,0,0)"); top.addColorStop(.14, dark ? "rgba(255,236,190,.07)" : "rgba(232,182,90,.16)"); top.addColorStop(1, "rgba(0,0,0,0)");
-  c.fillStyle = top; c.fillRect(0, 0, W, H);
-  if (!dark) {   // on paper, light only shows against shade: dim the room a little, then let the shafts cut through
-    const sh = c.createLinearGradient(0, 0, 0, H);
-    sh.addColorStop(0, "rgba(0,0,0,0)"); sh.addColorStop(.12, "rgba(150,118,70,.14)"); sh.addColorStop(.55, "rgba(150,118,70,.07)"); sh.addColorStop(1, "rgba(0,0,0,0)");
-    c.globalCompositeOperation = "multiply"; c.fillStyle = sh; c.fillRect(0, 0, W, H); c.globalCompositeOperation = "source-over";
+  const m = document.getElementById("mark").getBoundingClientRect(), cv = graceCv.getBoundingClientRect();
+  const cx = m.left + m.width / 2 - cv.left, cy = m.top + m.height * .47 - cv.top, R = m.height * .62;
+  const breathe = .82 + .18 * Math.sin(s * .8);
+  const gold = dark ? [214, 172, 84] : [150, 104, 22], col = a => `rgba(${gold[0]},${gold[1]},${gold[2]},${a})`;
+  // a soft warm bloom behind it all
+  const bloom = c.createRadialGradient(cx, cy, R * .2, cx, cy, R * 1.5);
+  bloom.addColorStop(0, col((dark ? .1 : .12) * breathe)); bloom.addColorStop(1, "rgba(0,0,0,0)");
+  c.fillStyle = bloom; c.fillRect(0, 0, W, H);
+  c.save(); c.translate(cx, cy); c.rotate(s * .035);
+  // fine rays between the rings, long and short, like a beaten-gold nimbus
+  for (let k = 0; k < 72; k++) {
+    const ang = k / 72 * Math.PI * 2, long = k % 2 === 0, r1 = R * .9, r2 = R * (long ? 1.24 : 1.1);
+    c.strokeStyle = col((long ? .3 : .2) * breathe); c.lineWidth = long ? 1.1 : .8;
+    c.beginPath(); c.moveTo(Math.cos(ang) * r1, Math.sin(ang) * r1); c.lineTo(Math.cos(ang) * r2, Math.sin(ang) * r2); c.stroke();
   }
-  // shafts of light, slanting and slowly shifting; soft edges from stacked layers
-  beams.forEach(b => {
-    const breathe = b.k * (.75 + .25 * Math.sin(s * b.sp * 2 + b.ph)), cx = (b.x + Math.sin(s * b.sp + b.ph) * .015) * W, len = H, lean = b.tilt * len;
-    for (let l = 0; l < 5; l++) {
-      const hw = W * b.w * (.35 + l * .2), a = (dark ? .016 : .13) * breathe;
-      const g = c.createLinearGradient(0, 0, 0, len);
-      g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(.12, dark ? `rgba(255,240,205,${a})` : `rgba(255,250,232,${a})`); g.addColorStop(.7, dark ? `rgba(255,240,205,${a * .35})` : `rgba(255,250,232,${a * .35})`); g.addColorStop(1, "rgba(0,0,0,0)");
-      c.fillStyle = g; c.beginPath();
-      c.moveTo(cx - hw * .45, -2); c.lineTo(cx + hw * .45, -2); c.lineTo(cx + lean + hw, len); c.lineTo(cx + lean - hw, len); c.closePath(); c.fill();
-    }
-  });
-  // motes of dust, drifting down and catching the light
-  motes.forEach(m => {
-    m.y += m.v * .016; if (m.y > 1.02) Object.assign(m, mote(), { y: -.02 });
-    const x = (m.x + Math.sin(s * .35 + m.ph) * .02) * W + Math.sin(s * 1.3 + m.ph * 3) * 3, y = m.y * H;
-    let lit = .35;   // brighter inside a beam
-    beams.forEach(b => { const bx = (b.x + Math.sin(s * b.sp + b.ph) * .015) * W + b.tilt * y; if (Math.abs(x - bx) < W * b.w * .9) lit = 1; });
-    const life = Math.min(1, m.y * 5) * Math.min(1, (1 - m.y) * 3), tw = .55 + .45 * Math.sin(s * m.tw + m.ph), a = life * lit * tw;
-    if (m.glint) {   // a tiny four-point glint
-      const r = m.s * 2.2 * (.6 + .4 * tw);
-      c.strokeStyle = dark ? `rgba(255,236,180,${.5 * a})` : `rgba(170,120,25,${.7 * a})`; c.lineWidth = .7;
-      c.beginPath(); c.moveTo(x - r, y); c.lineTo(x + r, y); c.moveTo(x, y - r); c.lineTo(x, y + r); c.stroke();
-    }
-    c.fillStyle = dark ? `rgba(255,${226 + m.tone * 20 | 0},170,${.55 * a})` : `rgba(${165 + m.tone * 30 | 0},112,22,${.75 * a})`;
-    c.beginPath(); c.arc(x, y, m.s, 0, Math.PI * 2); c.fill();
+  // the rings: a solid inner band and a beaded outer one
+  c.strokeStyle = col(.42 * breathe); c.lineWidth = 1.6; c.beginPath(); c.arc(0, 0, R * .9, 0, Math.PI * 2); c.stroke();
+  c.strokeStyle = col(.22 * breathe); c.lineWidth = .8; c.beginPath(); c.arc(0, 0, R * .86, 0, Math.PI * 2); c.stroke();
+  c.fillStyle = col(.34 * breathe);
+  for (let k = 0; k < 48; k++) { const ang = k / 48 * Math.PI * 2 + .03; c.beginPath(); c.arc(Math.cos(ang) * R * 1.3, Math.sin(ang) * R * 1.3, 1.1, 0, Math.PI * 2); c.fill(); }
+  c.restore();
+  // a few glints travelling round the ring
+  glints.forEach(g => {
+    const ang = g.a + s * .035, tw = Math.max(0, Math.sin(s * g.sp + g.ph)), x = cx + Math.cos(ang) * R * .9, y = cy + Math.sin(ang) * R * .9, r = 3.5 * tw;
+    if (r < .3) return;
+    c.strokeStyle = dark ? `rgba(255,236,180,${.7 * tw})` : `rgba(200,150,40,${.75 * tw})`; c.lineWidth = .8;
+    c.beginPath(); c.moveTo(x - r, y); c.lineTo(x + r, y); c.moveTo(x, y - r); c.lineTo(x, y + r); c.stroke();
   });
 }
 function graceLoop(t){
