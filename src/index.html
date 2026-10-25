@@ -1087,16 +1087,16 @@ function hellFrame(t){
   // a heat haze along the floor, breathing slowly
   const breathe = .85 + .15 * Math.sin(s * .9) + .05 * Math.sin(s * 2.7);
   const g = c.createLinearGradient(0, H, 0, 0);
-  g.addColorStop(0, dark ? `rgba(150,40,10,${.16 * breathe})` : `rgba(190,90,40,${.09 * breathe})`);
-  g.addColorStop(.5, dark ? `rgba(110,25,8,${.05 * breathe})` : `rgba(200,120,70,${.03 * breathe})`);
+  g.addColorStop(0, dark ? `rgba(150,40,10,${.16 * breathe})` : `rgba(175,70,20,${.2 * breathe})`);
+  g.addColorStop(.5, dark ? `rgba(110,25,8,${.05 * breathe})` : `rgba(185,95,40,${.07 * breathe})`);
   g.addColorStop(1, "rgba(0,0,0,0)");
   c.fillStyle = dark ? g : g; c.fillRect(0, 0, W, H);
   // soft tongues of flame, swaying, never sharp
   tongues.forEach(f => {
     const sway = Math.sin(s * f.sp + f.ph) * W * .02, hh = H * f.h * (.85 + .15 * Math.sin(s * f.sp * 1.7 + f.ph)), cx = f.x * W + sway, ww = W * f.w;
     const r = c.createRadialGradient(cx, H, 0, cx, H, hh);
-    r.addColorStop(0, dark ? "rgba(255,110,30,.07)" : "rgba(170,70,20,.05)");
-    r.addColorStop(.6, dark ? "rgba(200,50,10,.025)" : "rgba(190,100,50,.018)");
+    r.addColorStop(0, dark ? "rgba(255,110,30,.07)" : "rgba(165,60,15,.12)");
+    r.addColorStop(.6, dark ? "rgba(200,50,10,.025)" : "rgba(180,85,35,.045)");
     r.addColorStop(1, "rgba(0,0,0,0)");
     c.save(); c.translate(cx, H); c.scale(ww / hh, 1); c.translate(-cx, -H);
     c.fillStyle = r; c.beginPath(); c.arc(cx, H, hh, Math.PI, 0); c.fill(); c.restore();
@@ -1106,7 +1106,7 @@ function hellFrame(t){
   ash.forEach(a => {
     a.y -= a.v * .016; if (a.y < 0) { a.y = 1; a.x = Math.random(); }
     const x = a.x * W + Math.sin(s * .8 + a.ph) * 10, y = a.y * H, fade = Math.min(1, a.y * 1.6) * (1 - a.y * .2);
-    c.fillStyle = dark ? `rgba(255,150,70,${.22 * fade})` : `rgba(120,45,10,${.16 * fade})`;
+    c.fillStyle = dark ? `rgba(255,150,70,${.22 * fade})` : `rgba(110,35,8,${.3 * fade})`;
     c.beginPath(); c.arc(x, y, a.s, 0, Math.PI * 2); c.fill();
   });
 }
