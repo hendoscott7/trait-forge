@@ -10,3 +10,14 @@ Roll three d20s and get a **belief**, a **habit** and a **flaw** for your charac
 - Tap the logo to switch between dark and light.
 
 One self-contained `index.html`, using three.js from a CDN. No build step.
+
+## Building
+
+Edit `src/index.html`, then run:
+
+```
+npm install
+npm run build
+```
+
+That writes the minified `index.html` the site serves. It needs Python 3 with Pillow and ffmpeg: the build shrinks the sound clips and the logo before minifying.

@@ -1,0 +1,11 @@
+{
+  "name": "trait-forge",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "python3 tools/build.py src/index.html index.html"
+  },
+  "devDependencies": {
+    "html-minifier-terser": "7.2.0"
+  }
+}
