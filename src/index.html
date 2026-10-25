@@ -1159,11 +1159,16 @@ function graceFrame(t){
   const breathe = .8 + .2 * Math.sin(s * .8);
   const gold = dark ? [214, 172, 84] : [150, 104, 22], col = a => `rgba(${gold[0]},${gold[1]},${gold[2]},${a})`;
   // a soft warm glow, and one thin gilded ring
-  const bloom = c.createRadialGradient(cx, cy, R * .3, cx, cy, R * 1.4);
+  const bloom = c.createRadialGradient(cx, cy, R * .2, cx, cy, R * 1.5);
   bloom.addColorStop(0, col((dark ? .09 : .1) * breathe)); bloom.addColorStop(1, "rgba(0,0,0,0)");
   c.fillStyle = bloom; c.fillRect(0, 0, W, H);
-  c.strokeStyle = col(.45 * breathe); c.lineWidth = 1.5;
-  c.beginPath(); c.arc(cx, cy, R, 0, Math.PI * 2); c.stroke();
+  // the halo itself: a soft, blurred band of gold light, no hard edge
+  const ring = c.createRadialGradient(cx, cy, 0, cx, cy, R * 1.25);
+  const k = (dark ? .22 : .26) * breathe;
+  ring.addColorStop(0, "rgba(0,0,0,0)"); ring.addColorStop(.62, "rgba(0,0,0,0)");
+  ring.addColorStop(.74, col(k * .45)); ring.addColorStop(.8, col(k)); ring.addColorStop(.86, col(k * .45));
+  ring.addColorStop(1, "rgba(0,0,0,0)");
+  c.fillStyle = ring; c.fillRect(cx - R * 1.3, cy - R * 1.3, R * 2.6, R * 2.6);
   // fine dust drifting down
   motes.forEach(mt => {
     mt.y += mt.v * .016; if (mt.y > 1.02) Object.assign(mt, mote(), { y: -.02 });
