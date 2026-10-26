@@ -1082,6 +1082,7 @@ function fateLands(i){
 /* ---------- chaotic evil: a low, slow fire under the page ---------- */
 const hellCv = document.getElementById("hell"), hellCtx = hellCv.getContext("2d");
 let hellOn = false, hellRAF = 0, hellLast = 0;
+const flames = Array.from({ length: 12 }, (_, k) => ({ x: (k + .5 + (Math.random() - .5) * .6) / 12, w: 14 + Math.random() * 16, h: .2 + Math.random() * .16, ph: Math.random() * 6.28, sp: .8 + Math.random() * .7 }));
 const tongues = Array.from({ length: 14 }, (_, k) => ({ x: (k + Math.random() * .8) / 14, w: .08 + Math.random() * .09, h: .35 + Math.random() * .45, ph: Math.random() * 6.28, sp: .6 + Math.random() * .8 }));
 // ash: torn flakes that tumble as they rise; a few still glow at the edges
 const flake = () => {
@@ -1112,6 +1113,19 @@ function hellFrame(t){
     r.addColorStop(1, "rgba(0,0,0,0)");
     c.save(); c.translate(cx, H); c.scale(ww / hh, 1); c.translate(-cx, -H);
     c.fillStyle = r; c.beginPath(); c.arc(cx, H, hh, Math.PI, 0); c.fill(); c.restore();
+  });
+  // flames: flickering tongues along the floor, tips swaying and licking
+  flames.forEach(f => {
+    const x0 = f.x * W, hgt = (f.h + .25 * f.h * Math.sin(s * f.sp * 3 + f.ph) + .12 * f.h * Math.sin(s * f.sp * 7.3 + f.ph * 2)) * H, w = f.w;
+    const sway = Math.sin(s * f.sp * 1.6 + f.ph) * w * .9, base = H + 4, tipX = x0 + sway, tipY = base - hgt;
+    const g = c.createLinearGradient(0, base, 0, tipY);
+    if (dark) { g.addColorStop(0, "rgba(255,150,40,.16)"); g.addColorStop(.45, "rgba(240,70,15,.09)"); g.addColorStop(1, "rgba(200,30,5,0)"); }
+    else { g.addColorStop(0, "rgba(200,95,25,.14)"); g.addColorStop(.45, "rgba(175,55,15,.07)"); g.addColorStop(1, "rgba(150,40,10,0)"); }
+    c.fillStyle = g; c.beginPath();
+    c.moveTo(x0 - w, base);
+    c.bezierCurveTo(x0 - w, base - hgt * .45, tipX - w * .55, base - hgt * .7, tipX, tipY);
+    c.bezierCurveTo(tipX + w * .55, base - hgt * .7, x0 + w, base - hgt * .45, x0 + w, base);
+    c.closePath(); c.fill();
   });
   // ash, tumbling up on the heat
   c.globalCompositeOperation = "source-over";
@@ -1160,13 +1174,28 @@ function hellfire(on){
 /* ---------- lawful good: fine gold dust drifting down ---------- */
 const graceCv = document.getElementById("grace"), graceCtx = graceCv.getContext("2d");
 let graceOn = false, graceRAF = 0, graceLast = 0;
-const mote = () => ({ x: Math.random(), y: Math.random(), v: .006 + Math.random() * .014, s: .8 + Math.random() * 1.6, ph: Math.random() * 6.28, tw: 1.5 + Math.random() * 3, glint: Math.random() < .3, tone: Math.random() });
-const motes = Array.from({ length: 44 }, mote);
+const mote = () => ({ x: Math.random(), y: Math.random(), v: .006 + Math.random() * .014, s: .7 + Math.random() * 1.4, ph: Math.random() * 6.28, tw: 1.5 + Math.random() * 3, glint: Math.random() < .3, tone: Math.random() });
+const motes = Array.from({ length: 38 }, mote);
+// a few soft clouds, drifting slowly across the top
+const cloud = (x) => { const n = 5 + Math.floor(Math.random() * 4), puffs = []; for (let k = 0; k < n; k++) puffs.push({ dx: (k / (n - 1) - .5) * (1 + Math.random() * .3), dy: (Math.random() - .5) * .3 - Math.sin(k / (n - 1) * Math.PI) * .25, r: .28 + Math.random() * .22 }); return { x: x === undefined ? Math.random() : x, y: .1 + Math.random() * .3, w: 110 + Math.random() * 130, v: .004 + Math.random() * .005, puffs }; };
+const clouds = Array.from({ length: 5 }, (_, k) => cloud(k / 5 + Math.random() * .1));
 function graceFrame(t){
   const dpr = Math.min(devicePixelRatio || 1, 2), W = graceCv.clientWidth, H = graceCv.clientHeight;
   if (graceCv.width !== Math.round(W * dpr)) { graceCv.width = Math.round(W * dpr); graceCv.height = Math.round(H * dpr); }
   const dark = document.documentElement.dataset.mode === "dark", c = graceCtx, s = t / 1000;
   c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
+  // clouds: overlapping soft puffs, drifting left to right and wrapping round
+  clouds.forEach(cl => {
+    cl.x += cl.v * .016; if (cl.x > 1.4) Object.assign(cl, cloud(-.4));
+    const cx = cl.x * W, cy = cl.y * H, a = Math.min(1, (cl.x + .4) * 2) * Math.min(1, (1.4 - cl.x) * 2);
+    cl.puffs.forEach(pf => {
+      const px = cx + pf.dx * cl.w + Math.sin(s * .2 + pf.dx * 4) * 3, py = cy + pf.dy * cl.w * .5, r = pf.r * cl.w;
+      const g = c.createRadialGradient(px, py, 0, px, py, r);
+      if (dark) { g.addColorStop(0, `rgba(235,228,212,${.07 * a})`); g.addColorStop(1, "rgba(235,228,212,0)"); }
+      else { g.addColorStop(0, `rgba(255,255,255,${.55 * a})`); g.addColorStop(.6, `rgba(255,253,246,${.25 * a})`); g.addColorStop(1, "rgba(255,253,246,0)"); }
+      c.fillStyle = g; c.beginPath(); c.arc(px, py, r, 0, Math.PI * 2); c.fill();
+    });
+  });
   // fine dust drifting down
   motes.forEach(mt => {
     mt.y += mt.v * .016; if (mt.y > 1.02) Object.assign(mt, mote(), { y: -.02 });
@@ -1174,14 +1203,14 @@ function graceFrame(t){
     const life = Math.min(1, mt.y * 5) * Math.min(1, (1 - mt.y) * 3), tw = .55 + .45 * Math.sin(s * mt.tw + mt.ph), a = life * tw * .7;
     if (mt.glint) {
       const r = mt.s * 2.2 * (.6 + .4 * tw);
-      c.strokeStyle = dark ? `rgba(255,240,195,${.85 * a})` : `rgba(175,120,20,${.9 * a})`; c.lineWidth = .9;
+      c.strokeStyle = dark ? `rgba(255,240,195,${.7 * a})` : `rgba(175,120,20,${.75 * a})`; c.lineWidth = .85;
       c.beginPath(); c.moveTo(x - r, y); c.lineTo(x + r, y); c.moveTo(x, y - r); c.lineTo(x, y + r); c.stroke();
     }
     // each mote carries a soft golden glow around it
     const gr = c.createRadialGradient(x, y, 0, x, y, mt.s * 6);
-    gr.addColorStop(0, dark ? `rgba(255,214,120,${.35 * a})` : `rgba(214,150,40,${.3 * a})`); gr.addColorStop(1, "rgba(0,0,0,0)");
+    gr.addColorStop(0, dark ? `rgba(255,214,120,${.26 * a})` : `rgba(214,150,40,${.22 * a})`); gr.addColorStop(1, "rgba(0,0,0,0)");
     c.fillStyle = gr; c.beginPath(); c.arc(x, y, mt.s * 6, 0, Math.PI * 2); c.fill();
-    c.fillStyle = dark ? `rgba(255,${232 + mt.tone * 20 | 0},180,${.9 * a})` : `rgba(${170 + mt.tone * 30 | 0},112,18,${.95 * a})`;
+    c.fillStyle = dark ? `rgba(255,${232 + mt.tone * 20 | 0},180,${.75 * a})` : `rgba(${170 + mt.tone * 30 | 0},112,18,${.8 * a})`;
     c.beginPath(); c.arc(x, y, mt.s, 0, Math.PI * 2); c.fill();
   });
 }
