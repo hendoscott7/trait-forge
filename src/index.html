@@ -610,18 +610,20 @@ const Dice = (() => {
   const SKINS = {
     bone:     { base: ["#e2d6bb", "#c4b08a"], swirl: ["rgba(150,110,55,.22)", "rgba(255,248,230,.2)"], edge: "rgba(80,55,25,.42)", edgeHi: "rgba(255,250,235,.35)", ink: "#1a1009", inkSh: "rgba(255,250,235,.55)", rub: "rgba(214,200,170,.55)", scratch: "rgba(70,48,22,.45)", pit: "rgba(60,40,20,.5)", chip: "#b39b72", chipEdge: "rgba(60,40,18,.6)", rough: 1.15, coat: .25, env: .85, metal: 0 },
     obsidian: { base: ["#0b0a0d", "#030304"], swirl: ["rgba(90,90,110,.16)", "rgba(40,20,30,.25)"], edge: "rgba(150,150,160,.22)", edgeHi: "rgba(255,255,255,.12)", ink: "#e9dfcb", inkSh: "rgba(0,0,0,.7)", rub: "rgba(20,20,22,.5)", scratch: "rgba(210,210,220,.28)", pit: "rgba(200,200,210,.3)", chip: "#3b3a3f", chipEdge: "rgba(0,0,0,.6)", rough: .9, coat: .7, env: .5, metal: 0 },
-    // lawful good: white marble veined with gold, gilded numerals
+    // the 3x3 as one system: good is pale stone, neutral is mid-tone, evil is near black;
+    // lawful leans gold, neutral leans green, chaotic leans red
+    // lawful good: white marble veined with gold, dark bronze numerals
     "1,1":   { base: ["#f5f2eb", "#d8d1c2"], swirl: ["rgba(190,170,120,.16)", "rgba(255,255,255,.4)"], veins: "rgba(176,140,60,.55)", edge: "rgba(150,130,90,.3)", edgeHi: "rgba(255,255,255,.6)", ink: "#5c3d06", inkSh: "rgba(255,250,235,.8)", rub: "rgba(240,236,226,.4)", scratch: "rgba(140,120,80,.3)", pit: "rgba(120,100,60,.35)", chip: "#e9e2d2", chipEdge: "rgba(120,100,60,.4)", rough: .45, coat: 1, env: 1, metal: 0 },
-    // neutral good: sage jade
-    "0,1":   { base: ["#a7bb9f", "#6c8768"], swirl: ["rgba(230,245,220,.28)", "rgba(35,65,35,.28)"], edge: "rgba(30,50,30,.35)", edgeHi: "rgba(240,255,235,.3)", ink: "#f6f3e8", inkSh: "rgba(0,30,0,.4)", rub: "rgba(160,185,150,.4)", scratch: "rgba(240,255,240,.3)", pit: "rgba(30,50,30,.4)", chip: "#c3d4bc", chipEdge: "rgba(30,50,30,.45)", rough: .4, coat: 1, env: .95, metal: 0 },
-    // chaotic good: deep azure glass
-    "-1,1":  { base: ["#5fa3db", "#22568f"], swirl: ["rgba(225,242,255,.38)", "rgba(10,30,70,.32)"], edge: "rgba(10,30,70,.35)", edgeHi: "rgba(230,245,255,.5)", ink: "#ffffff", inkSh: "rgba(0,10,50,.45)", rub: "rgba(120,170,220,.3)", scratch: "rgba(235,248,255,.35)", pit: "rgba(10,30,70,.4)", chip: "#a9cdee", chipEdge: "rgba(10,30,70,.4)", rough: .18, coat: 1, env: 1.25, metal: 0, glow: { color: 0x9fd2ff, k: .15 } },
-    // lawful neutral: brushed iron
-    "1,0":   { base: ["#8d9094", "#4a4d51"], brushed: true, swirl: ["rgba(255,255,255,.08)", "rgba(0,0,0,.12)"], edge: "rgba(20,20,22,.4)", edgeHi: "rgba(255,255,255,.35)", ink: "#121316", inkSh: "rgba(255,255,255,.35)", rub: "rgba(120,123,128,.4)", scratch: "rgba(230,232,236,.45)", pit: "rgba(20,20,22,.45)", chip: "#b5b8bc", chipEdge: "rgba(20,20,22,.5)", rough: .42, coat: .2, env: 1.2, metal: .85 },
-    // true neutral: old oak
-    "0,0":   { base: ["#8c6439", "#5a3b1e"], grain: true, swirl: ["rgba(255,220,170,.08)", "rgba(40,20,5,.18)"], edge: "rgba(30,15,5,.45)", edgeHi: "rgba(255,225,180,.25)", ink: "#f2e4c6", inkSh: "rgba(0,0,0,.55)", rub: "rgba(110,80,45,.4)", scratch: "rgba(240,215,175,.35)", pit: "rgba(30,15,5,.5)", chip: "#b48a5c", chipEdge: "rgba(30,15,5,.5)", rough: .85, coat: .35, env: .7, metal: 0 },
-    // chaotic neutral: storm marble, violet into teal
-    "-1,0":  { base: ["#3b2a60", "#1a5a5b"], swirl: ["rgba(225,130,255,.38)", "rgba(70,240,215,.32)"], swirls: 14, edge: "rgba(10,5,25,.4)", edgeHi: "rgba(240,220,255,.3)", ink: "#f7f1ff", inkSh: "rgba(10,0,30,.55)", rub: "rgba(80,70,120,.35)", scratch: "rgba(240,230,255,.3)", pit: "rgba(10,5,25,.45)", chip: "#8d7cb3", chipEdge: "rgba(10,5,25,.45)", rough: .28, coat: 1, env: 1.05, metal: 0 },
+    // neutral good: pale jade, deep green numerals
+    "0,1":   { base: ["#d3dfc9", "#a3b897"], swirl: ["rgba(245,255,240,.35)", "rgba(60,95,50,.18)"], edge: "rgba(40,70,35,.3)", edgeHi: "rgba(250,255,245,.5)", ink: "#2c4a24", inkSh: "rgba(250,255,245,.7)", rub: "rgba(200,215,190,.4)", scratch: "rgba(50,80,45,.3)", pit: "rgba(40,70,35,.35)", chip: "#e4ecdd", chipEdge: "rgba(40,70,35,.4)", rough: .4, coat: 1, env: .95, metal: 0 },
+    // chaotic good: rose quartz, deep red numerals
+    "-1,1":  { base: ["#f0dcd6", "#cfa39a"], swirl: ["rgba(255,245,240,.4)", "rgba(160,60,50,.18)"], edge: "rgba(120,45,35,.3)", edgeHi: "rgba(255,248,245,.55)", ink: "#7c1d12", inkSh: "rgba(255,248,245,.7)", rub: "rgba(235,210,205,.4)", scratch: "rgba(130,50,40,.3)", pit: "rgba(120,45,35,.35)", chip: "#f6e8e4", chipEdge: "rgba(120,45,35,.4)", rough: .3, coat: 1, env: 1, metal: 0 },
+    // lawful neutral: brushed iron, brass numerals
+    "1,0":   { base: ["#8d9094", "#4a4d51"], brushed: true, swirl: ["rgba(255,255,255,.08)", "rgba(0,0,0,.12)"], edge: "rgba(20,20,22,.4)", edgeHi: "rgba(255,255,255,.35)", ink: "#f0c66a", inkSh: "rgba(0,0,0,.6)", rub: "rgba(120,123,128,.4)", scratch: "rgba(230,232,236,.45)", pit: "rgba(20,20,22,.45)", chip: "#b5b8bc", chipEdge: "rgba(20,20,22,.5)", rough: .42, coat: .2, env: 1.2, metal: .85 },
+    // true neutral: old oak, pale moss numerals
+    "0,0":   { base: ["#8c6439", "#5a3b1e"], grain: true, swirl: ["rgba(255,220,170,.08)", "rgba(40,20,5,.18)"], edge: "rgba(30,15,5,.45)", edgeHi: "rgba(255,225,180,.25)", ink: "#d4e3ab", inkSh: "rgba(0,0,0,.55)", rub: "rgba(110,80,45,.4)", scratch: "rgba(240,215,175,.35)", pit: "rgba(30,15,5,.5)", chip: "#b48a5c", chipEdge: "rgba(30,15,5,.5)", rough: .85, coat: .35, env: .7, metal: 0 },
+    // chaotic neutral: oxblood marble, pale numerals
+    "-1,0":  { base: ["#93433a", "#521c18"], swirl: ["rgba(255,150,120,.28)", "rgba(30,0,0,.32)"], swirls: 12, edge: "rgba(25,5,5,.4)", edgeHi: "rgba(255,220,210,.3)", ink: "#f7e6dc", inkSh: "rgba(20,0,0,.55)", rub: "rgba(110,50,45,.35)", scratch: "rgba(255,225,215,.3)", pit: "rgba(25,5,5,.45)", chip: "#b0675c", chipEdge: "rgba(25,5,5,.45)", rough: .28, coat: 1, env: 1.05, metal: 0 },
     // lawful evil: black glass, gilt numerals
     "1,-1":  { base: ["#0d0b0c", "#020202"], swirl: ["rgba(120,90,40,.12)", "rgba(40,20,20,.25)"], edge: "rgba(180,140,60,.25)", edgeHi: "rgba(255,230,170,.15)", ink: "#d9a33b", inkSh: "rgba(0,0,0,.8)", rub: "rgba(20,15,10,.45)", scratch: "rgba(220,190,130,.25)", pit: "rgba(200,170,110,.25)", chip: "#3d3428", chipEdge: "rgba(0,0,0,.6)", rough: .3, coat: 1, env: .7, metal: 0, glow: { color: 0xffb040, k: .22 } },
     // neutral evil: poison, black-green with a sickly glow
@@ -1155,7 +1157,7 @@ function hellfire(on){
   if (on) { if (reduce) hellFrame(0); else if (!hellRAF) hellRAF = requestAnimationFrame(hellLoop); }
   else setTimeout(() => { if (!hellOn) hellCtx.clearRect(0, 0, hellCv.width, hellCv.height); }, 1300);
 }
-/* ---------- lawful good: a gilded halo behind the logo ---------- */
+/* ---------- lawful good: fine gold dust drifting down ---------- */
 const graceCv = document.getElementById("grace"), graceCtx = graceCv.getContext("2d");
 let graceOn = false, graceRAF = 0, graceLast = 0;
 const mote = () => ({ x: Math.random(), y: Math.random(), v: .006 + Math.random() * .014, s: .5 + Math.random() * 1.3, ph: Math.random() * 6.28, tw: 1.5 + Math.random() * 3, glint: Math.random() < .3, tone: Math.random() });
@@ -1165,21 +1167,6 @@ function graceFrame(t){
   if (graceCv.width !== Math.round(W * dpr)) { graceCv.width = Math.round(W * dpr); graceCv.height = Math.round(H * dpr); }
   const dark = document.documentElement.dataset.mode === "dark", c = graceCtx, s = t / 1000;
   c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
-  const m = document.getElementById("mark").getBoundingClientRect(), cv = graceCv.getBoundingClientRect();
-  const cx = m.left + m.width / 2 - cv.left, cy = m.top + m.height * .47 - cv.top, R = m.height * .58;
-  const breathe = .8 + .2 * Math.sin(s * .8);
-  const gold = dark ? [214, 172, 84] : [150, 104, 22], col = a => `rgba(${gold[0]},${gold[1]},${gold[2]},${a})`;
-  // a soft warm glow, and one thin gilded ring
-  const bloom = c.createRadialGradient(cx, cy, R * .2, cx, cy, R * 1.5);
-  bloom.addColorStop(0, col((dark ? .14 : .17) * breathe)); bloom.addColorStop(1, "rgba(0,0,0,0)");
-  c.fillStyle = bloom; c.fillRect(0, 0, W, H);
-  // the halo itself: a soft, blurred band of gold light, no hard edge
-  const ring = c.createRadialGradient(cx, cy, 0, cx, cy, R * 1.45);
-  const k = (dark ? .24 : .3) * breathe;
-  ring.addColorStop(0, "rgba(0,0,0,0)"); ring.addColorStop(.38, "rgba(0,0,0,0)");
-  ring.addColorStop(.52, col(k * .35)); ring.addColorStop(.62, col(k * .8)); ring.addColorStop(.69, col(k)); ring.addColorStop(.76, col(k * .8)); ring.addColorStop(.86, col(k * .35));
-  ring.addColorStop(1, "rgba(0,0,0,0)");
-  c.fillStyle = ring; c.fillRect(cx - R * 1.5, cy - R * 1.5, R * 3, R * 3);
   // fine dust drifting down
   motes.forEach(mt => {
     mt.y += mt.v * .016; if (mt.y > 1.02) Object.assign(mt, mote(), { y: -.02 });
