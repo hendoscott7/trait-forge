@@ -611,7 +611,7 @@ const Dice = (() => {
     bone:     { base: ["#e2d6bb", "#c4b08a"], swirl: ["rgba(150,110,55,.22)", "rgba(255,248,230,.2)"], edge: "rgba(80,55,25,.42)", edgeHi: "rgba(255,250,235,.35)", ink: "#1a1009", inkSh: "rgba(255,250,235,.55)", rub: "rgba(214,200,170,.55)", scratch: "rgba(70,48,22,.45)", pit: "rgba(60,40,20,.5)", chip: "#b39b72", chipEdge: "rgba(60,40,18,.6)", rough: 1.15, coat: .25, env: .85, metal: 0 },
     obsidian: { base: ["#0b0a0d", "#030304"], swirl: ["rgba(90,90,110,.16)", "rgba(40,20,30,.25)"], edge: "rgba(150,150,160,.22)", edgeHi: "rgba(255,255,255,.12)", ink: "#e9dfcb", inkSh: "rgba(0,0,0,.7)", rub: "rgba(20,20,22,.5)", scratch: "rgba(210,210,220,.28)", pit: "rgba(200,200,210,.3)", chip: "#3b3a3f", chipEdge: "rgba(0,0,0,.6)", rough: .9, coat: .7, env: .5, metal: 0 },
     // lawful good: white marble veined with gold, gilded numerals
-    "1,1":   { base: ["#f5f2eb", "#d8d1c2"], swirl: ["rgba(190,170,120,.16)", "rgba(255,255,255,.4)"], veins: "rgba(176,140,60,.55)", edge: "rgba(150,130,90,.3)", edgeHi: "rgba(255,255,255,.6)", ink: "#a87a14", inkSh: "rgba(255,255,255,.7)", rub: "rgba(240,236,226,.4)", scratch: "rgba(140,120,80,.3)", pit: "rgba(120,100,60,.35)", chip: "#e9e2d2", chipEdge: "rgba(120,100,60,.4)", rough: .45, coat: 1, env: 1, metal: 0, glow: { color: 0xffc860, k: .25 } },
+    "1,1":   { base: ["#f5f2eb", "#d8d1c2"], swirl: ["rgba(190,170,120,.16)", "rgba(255,255,255,.4)"], veins: "rgba(176,140,60,.55)", edge: "rgba(150,130,90,.3)", edgeHi: "rgba(255,255,255,.6)", ink: "#5c3d06", inkSh: "rgba(255,250,235,.8)", rub: "rgba(240,236,226,.4)", scratch: "rgba(140,120,80,.3)", pit: "rgba(120,100,60,.35)", chip: "#e9e2d2", chipEdge: "rgba(120,100,60,.4)", rough: .45, coat: 1, env: 1, metal: 0 },
     // neutral good: sage jade
     "0,1":   { base: ["#a7bb9f", "#6c8768"], swirl: ["rgba(230,245,220,.28)", "rgba(35,65,35,.28)"], edge: "rgba(30,50,30,.35)", edgeHi: "rgba(240,255,235,.3)", ink: "#f6f3e8", inkSh: "rgba(0,30,0,.4)", rub: "rgba(160,185,150,.4)", scratch: "rgba(240,255,240,.3)", pit: "rgba(30,50,30,.4)", chip: "#c3d4bc", chipEdge: "rgba(30,50,30,.45)", rough: .4, coat: 1, env: .95, metal: 0 },
     // chaotic good: deep azure glass
@@ -1119,15 +1119,26 @@ function hellFrame(t){
     const wind = Math.sin(s * .6 + a.ph) * 14 + Math.sin(s * 1.9 + a.ph * 2) * 4;
     const x = a.x * W + wind, y = a.y * H, life = Math.min(1, (1 - a.y) * 6) * Math.min(1, a.y * 2.2);
     const turn = Math.cos(s * a.fs + a.flip);   // the flake turning edge-on and back
+    // now and then a flake catches and glows red for a moment
+    if (!a.fl && Math.random() < .0016) a.fl = s;
+    let fl = 0;
+    if (a.fl) { const e = (s - a.fl) / 1.8; if (e >= 1) a.fl = 0; else fl = Math.sin(e * Math.PI); }
+    if (fl > .02) {
+      const gr = c.createRadialGradient(x, y, 0, x, y, a.s * 5);
+      gr.addColorStop(0, dark ? `rgba(255,70,25,${.5 * fl * life})` : `rgba(190,30,10,${.32 * fl * life})`); gr.addColorStop(1, "rgba(0,0,0,0)");
+      c.fillStyle = gr; c.beginPath(); c.arc(x, y, a.s * 5, 0, Math.PI * 2); c.fill();
+    }
     c.save(); c.translate(x, y); c.rotate(a.rot + s * a.spin); c.scale(a.s * (.25 + .75 * Math.abs(turn)), a.s);
     c.beginPath(); a.pts.forEach((q, k) => k ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1])); c.closePath();
     if (dark) {
       const g = 150 + a.tone * 60;
       c.fillStyle = `rgba(${g},${g - 8},${g - 16},${.32 * life})`; c.fill();
+      if (fl > .02) { c.fillStyle = `rgba(255,${90 + 60 * fl | 0},40,${.8 * fl * life})`; c.fill(); }
       if (a.hot) { const glow = .5 + .5 * Math.sin(s * 7 + a.ph); c.lineWidth = .5 / a.s; c.strokeStyle = `rgba(255,${120 + glow * 60 | 0},40,${(.35 + .4 * glow) * life * (1 - a.y * .8)})`; c.stroke(); }
     } else {
       const g = 55 + a.tone * 50;
       c.fillStyle = `rgba(${g},${g - 6},${g - 10},${.3 * life})`; c.fill();
+      if (fl > .02) { c.fillStyle = `rgba(185,35,12,${.7 * fl * life})`; c.fill(); }
       if (a.hot) { c.lineWidth = .5 / a.s; c.strokeStyle = `rgba(150,60,15,${.35 * life * (1 - a.y * .8)})`; c.stroke(); }
     }
     c.restore();
@@ -1160,11 +1171,11 @@ function graceFrame(t){
   const gold = dark ? [214, 172, 84] : [150, 104, 22], col = a => `rgba(${gold[0]},${gold[1]},${gold[2]},${a})`;
   // a soft warm glow, and one thin gilded ring
   const bloom = c.createRadialGradient(cx, cy, R * .2, cx, cy, R * 1.5);
-  bloom.addColorStop(0, col((dark ? .09 : .1) * breathe)); bloom.addColorStop(1, "rgba(0,0,0,0)");
+  bloom.addColorStop(0, col((dark ? .14 : .17) * breathe)); bloom.addColorStop(1, "rgba(0,0,0,0)");
   c.fillStyle = bloom; c.fillRect(0, 0, W, H);
   // the halo itself: a soft, blurred band of gold light, no hard edge
   const ring = c.createRadialGradient(cx, cy, 0, cx, cy, R * 1.45);
-  const k = (dark ? .13 : .15) * breathe;
+  const k = (dark ? .24 : .3) * breathe;
   ring.addColorStop(0, "rgba(0,0,0,0)"); ring.addColorStop(.38, "rgba(0,0,0,0)");
   ring.addColorStop(.52, col(k * .35)); ring.addColorStop(.62, col(k * .8)); ring.addColorStop(.69, col(k)); ring.addColorStop(.76, col(k * .8)); ring.addColorStop(.86, col(k * .35));
   ring.addColorStop(1, "rgba(0,0,0,0)");
