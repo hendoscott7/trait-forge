@@ -82,7 +82,7 @@ body{
 .scrim{position:fixed; inset:-30vh 0; z-index:50; background:rgba(0,0,0,.42)}
 .drawer{position:fixed; z-index:51; left:max(var(--edge), env(safe-area-inset-left, 0px)); right:max(var(--edge), env(safe-area-inset-right, 0px)); bottom:calc(var(--edge) + env(safe-area-inset-bottom, 0px)); max-width:520px; margin:0 auto;
   background:var(--paper); color:var(--ink); border-radius:24px; box-shadow:0 10px 40px rgba(0,0,0,.35);
-  padding:10px 18px 22px; display:flex; flex-direction:column; gap:14px}
+  padding:10px 12px 22px; display:flex; flex-direction:column; gap:14px}
 .dclose{position:absolute; top:10px; right:10px; width:44px; height:44px; display:grid; place-items:center; padding:0; border:0; background:none; color:var(--paper); cursor:pointer; transition:transform .15s}
 .dclose::before{content:""; position:absolute; z-index:-1; width:34px; height:34px; border-radius:50%; background:var(--ink)}
 .dclose{isolation:isolate}
@@ -90,19 +90,31 @@ body{
 .dclose:active{transform:scale(.92)}
 .grab{align-self:center; width:38px; height:4px; border-radius:2px; background:var(--ring)}
 .drawer[hidden], .scrim[hidden]{display:none}
-.chart{position:relative; align-self:center; width:min(78vw, 280px); aspect-ratio:1; max-width:100%; margin:14px 0 6px}
-.pad{position:absolute; inset:0; cursor:pointer; touch-action:none; border-radius:18px}
-.pad::before, .pad::after{content:""; position:absolute; background:var(--ring)}
-.pad::before{left:16.6%; right:16.6%; top:50%; height:1px}
-.pad::after{top:16.6%; bottom:16.6%; left:50%; width:1px}
-.pad i{position:absolute; width:12px; height:12px; margin:-6px 0 0 -6px; border-radius:50%; background:var(--mute); transition:transform .2s cubic-bezier(.2,1.6,.4,1), background .2s}
-.pad i.on{background:var(--ink); transform:scale(2.2)}
+.chart{position:relative; align-self:center; width:min(calc(100% - 52px), 340px); aspect-ratio:1; max-width:100%; margin:26px 0 34px}
+.pad{position:absolute; inset:0; cursor:pointer; touch-action:none; border-radius:22px; border:1.5px solid var(--mute)}
+.pad::before, .pad::after{content:""; position:absolute; pointer-events:none}
+.pad::before{inset:0; background:linear-gradient(90deg, transparent calc(33.333% - .5px), var(--ring) calc(33.333% - .5px), var(--ring) calc(33.333% + .5px), transparent calc(33.333% + .5px), transparent calc(66.666% - .5px), var(--ring) calc(66.666% - .5px), var(--ring) calc(66.666% + .5px), transparent calc(66.666% + .5px))}
+.pad::after{inset:0; background:linear-gradient(180deg, transparent calc(33.333% - .5px), var(--ring) calc(33.333% - .5px), var(--ring) calc(33.333% + .5px), transparent calc(33.333% + .5px), transparent calc(66.666% - .5px), var(--ring) calc(66.666% - .5px), var(--ring) calc(66.666% + .5px), transparent calc(66.666% + .5px))}
+.pad i{position:absolute; width:33.333%; height:33.333%; z-index:1}
+.pad i::before{content:""; position:absolute; inset:7px; border-radius:15px; background:var(--ink); opacity:0; transform:scale(.45); transition:transform .38s cubic-bezier(.2,1.5,.35,1), opacity .18s ease}
+.pad i::after{content:""; position:absolute; left:50%; top:50%; width:9px; height:9px; margin:-4.5px 0 0 -4.5px; border-radius:50%; background:var(--mute); transition:background .2s, transform .3s cubic-bezier(.2,1.6,.4,1)}
+.pad i.on::before{opacity:.13; transform:none}
+.pad i.on::after{background:var(--ink); transform:scale(1.9)}
+/* opening: the frame settles in, the lines draw, the cells pop from the centre outwards */
+@keyframes frameIn{from{opacity:0; transform:scale(.9)}to{opacity:1; transform:none}}
+@keyframes linesIn{from{opacity:0; clip-path:inset(50% 50% 50% 50%)}to{opacity:1; clip-path:inset(0)}}
+@keyframes dotIn{from{transform:scale(0)}60%{transform:scale(1.3)}to{transform:scale(1)}}
+.chart.intro .pad{animation:frameIn .42s cubic-bezier(.2,.9,.3,1) both}
+.chart.intro .pad::before, .chart.intro .pad::after{animation:linesIn .5s .12s ease-out both}
+.chart.intro .pad i::after{animation:dotIn .36s calc(.16s + var(--d, 0s)) cubic-bezier(.2,.9,.3,1) both}
+@keyframes axIn{from{opacity:0}to{opacity:1}}
+.chart.intro .ax{animation:axIn .4s .2s ease-out both}
 .ax{position:absolute; font-family:"IM Fell English SC", "IM Fell English", Georgia, serif; font-size:.78rem; letter-spacing:.14em; text-transform:lowercase; color:var(--soft); pointer-events:none}
-.ax-t{top:-14px; left:50%; transform:translateX(-50%)}
-.ax-b{bottom:-14px; left:50%; transform:translateX(-50%)}
-.ax-l{left:-6px; top:50%; transform:translate(-50%, -50%) rotate(-90deg)}
-.ax-r{right:-6px; top:50%; transform:translate(50%, -50%) rotate(90deg)}
-.aname{position:absolute; left:0; top:0; z-index:2; white-space:nowrap; font-family:"IM Fell English SC", "IM Fell English", Georgia, serif; font-size:.82rem; letter-spacing:.06em; line-height:1; padding:5px 10px 6px; border-radius:999px; background:var(--ink); color:var(--paper); box-shadow:0 2px 8px rgba(0,0,0,.18); pointer-events:none; transition:opacity .15s}
+.ax-t{top:-24px; left:50%; transform:translateX(-50%)}
+.ax-b{bottom:-36px; left:50%; transform:translateX(-50%)}
+.ax-l{left:-16px; top:50%; transform:translate(-50%, -50%) rotate(-90deg)}
+.ax-r{right:-16px; top:50%; transform:translate(50%, -50%) rotate(90deg)}
+.aname{position:absolute; left:50%; bottom:0; z-index:3; white-space:nowrap; font-family:"IM Fell English", Georgia, serif; font-size:.95rem; line-height:1; padding:6px 13px 7px; border-radius:999px; background:var(--ink); color:var(--paper); box-shadow:0 3px 10px rgba(0,0,0,.2); pointer-events:none; transform:translate(-50%, 50%); transition:opacity .18s}
 .aname.any{opacity:0}
 main{box-sizing:border-box; will-change:transform; max-width:500px; min-height:100%; margin:0 auto; display:flex; flex-direction:column; padding-block:calc(var(--edge) + env(safe-area-inset-top, 0px) + 50px) calc(var(--floor) + var(--foot) - var(--edge) + 16px)}
 .head{padding-top:clamp(4px, 2vh, 18px)}
@@ -1532,19 +1544,15 @@ rollAllBtn.addEventListener("click", e => {
   const nameOf = a => !a ? "Any" : (a.law === 0 && a.moral === 0 ? "True Neutral" : LAW[a.law] + " " + MOR[a.moral]);
   const dots = [];
   for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
-    const d = document.createElement("i"); d.style.left = (16.6 + c * 33.4) + "%"; d.style.top = (16.6 + r * 33.4) + "%";
-    d.dataset.law = String(1 - c); d.dataset.moral = String(1 - r); pad.appendChild(d); dots.push(d);
+    const d = document.createElement("i"); d.style.left = (c * 33.333) + "%"; d.style.top = (r * 33.333) + "%";
+    d.dataset.law = String(1 - c); d.dataset.moral = String(1 - r); d.style.setProperty("--d", (Math.abs(r - 1) + Math.abs(c - 1)) * .06 + "s"); pad.appendChild(d); dots.push(d);
   }
   function show(){
     const name = nameOf(ALIGN);
     dots.forEach(d => d.classList.toggle("on", !!ALIGN && +d.dataset.law === ALIGN.law && +d.dataset.moral === ALIGN.moral));
     aname.textContent = ALIGN ? name : ""; aname.classList.toggle("any", !ALIGN);
-    if (ALIGN) {   // a small tag by the lit dot: centred on it, below on the top row, above elsewhere, kept inside the chart
-      const c = 1 - ALIGN.law, r = 1 - ALIGN.moral, cw = aname.parentNode.clientWidth, w = aname.offsetWidth, h = aname.offsetHeight;
-      const dx = cw * (16.6 + c * 33.4) / 100, dy = cw * (16.6 + r * 33.4) / 100;
-      aname.style.left = Math.max(0, Math.min(cw - w, dx - w / 2)) + "px";
-      aname.style.top = (r === 0 ? dy + 22 : dy - h - 22) + "px";
-    } pad.setAttribute("aria-valuetext", name);
+    if (ALIGN && aname.dataset.last !== name && !reduce) aname.animate([{ transform: "translate(-50%, 50%) scale(.82)", opacity: .3 }, { transform: "translate(-50%, 50%) scale(1.06)", opacity: 1, offset: .6 }, { transform: "translate(-50%, 50%)", opacity: 1 }], { duration: 300, easing: "cubic-bezier(.2,.9,.3,1)" });
+    aname.dataset.last = ALIGN ? name : ""; pad.setAttribute("aria-valuetext", name);
     btn.setAttribute("aria-label", "Alignment: " + name); btn.classList.toggle("set", !!ALIGN);
     let g = '<rect x="4" y="4" width="16" height="16" rx="2.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.33 4.5v15M14.67 4.5v15M4.5 9.33h15M4.5 14.67h15" stroke="currentColor" stroke-width="1.1" opacity=".4"/>';
     if (ALIGN) { const c = 1 - ALIGN.law, r = 1 - ALIGN.moral; g += '<rect x="' + (4.6 + c * 5.33) + '" y="' + (4.6 + r * 5.33) + '" width="4.13" height="4.13" rx=".8" fill="currentColor"/>'; }
@@ -1557,6 +1565,7 @@ rollAllBtn.addEventListener("click", e => {
   let open = false, closeT = null;
   function openDrawer(){
     if (open) return; open = true; scrim.hidden = false; drawer.hidden = false; drawer.style.transform = ""; show();
+    const ch = pad.parentNode; if (!reduce) { ch.classList.remove("intro"); void ch.offsetWidth; ch.classList.add("intro"); setTimeout(() => ch.classList.remove("intro"), 1000); }
     if (!reduce) { drawer.animate([{ transform: "translateY(calc(100% + 60px))" }, { transform: "none" }], { duration: 320, easing: "cubic-bezier(.2,.9,.3,1)" }); scrim.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220 }); }
     pad.focus({ preventScroll: true });
   }
