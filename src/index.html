@@ -102,7 +102,7 @@ body{
 .ax-b{bottom:-14px; left:50%; transform:translateX(-50%)}
 .ax-l{left:-6px; top:50%; transform:translate(-50%, -50%) rotate(-90deg)}
 .ax-r{right:-6px; top:50%; transform:translate(50%, -50%) rotate(90deg)}
-.aname{position:absolute; z-index:2; white-space:nowrap; font-size:1.02rem; line-height:1; padding:3px 7px 4px; border-radius:8px; background:var(--paper); color:var(--ink); pointer-events:none; transition:opacity .15s}
+.aname{position:absolute; left:0; top:0; z-index:2; white-space:nowrap; font-family:"IM Fell English SC", "IM Fell English", Georgia, serif; font-size:.82rem; letter-spacing:.06em; line-height:1; padding:5px 10px 6px; border-radius:999px; background:var(--ink); color:var(--paper); box-shadow:0 2px 8px rgba(0,0,0,.18); pointer-events:none; transition:opacity .15s}
 .aname.any{opacity:0}
 main{box-sizing:border-box; will-change:transform; max-width:500px; min-height:100%; margin:0 auto; display:flex; flex-direction:column; padding-block:calc(var(--edge) + env(safe-area-inset-top, 0px) + 50px) calc(var(--floor) + var(--foot) - var(--edge) + 16px)}
 .head{padding-top:clamp(4px, 2vh, 18px)}
@@ -1539,10 +1539,11 @@ rollAllBtn.addEventListener("click", e => {
     const name = nameOf(ALIGN);
     dots.forEach(d => d.classList.toggle("on", !!ALIGN && +d.dataset.law === ALIGN.law && +d.dataset.moral === ALIGN.moral));
     aname.textContent = ALIGN ? name : ""; aname.classList.toggle("any", !ALIGN);
-    if (ALIGN) {   // the name sits by the lit dot: below it on the top row, above it otherwise; edge columns lean inward
-      const c = 1 - ALIGN.law, r = 1 - ALIGN.moral;
-      aname.style.left = (16.6 + c * 33.4) + "%"; aname.style.top = "calc(" + (16.6 + r * 33.4) + "% " + (r === 0 ? "+ 18px" : "- 38px") + ")";
-      aname.style.transform = "translateX(" + (c === 0 ? "-28%" : c === 2 ? "-72%" : "-50%") + ")";
+    if (ALIGN) {   // a small tag by the lit dot: centred on it, below on the top row, above elsewhere, kept inside the chart
+      const c = 1 - ALIGN.law, r = 1 - ALIGN.moral, cw = aname.parentNode.clientWidth, w = aname.offsetWidth, h = aname.offsetHeight;
+      const dx = cw * (16.6 + c * 33.4) / 100, dy = cw * (16.6 + r * 33.4) / 100;
+      aname.style.left = Math.max(0, Math.min(cw - w, dx - w / 2)) + "px";
+      aname.style.top = (r === 0 ? dy + 22 : dy - h - 22) + "px";
     } pad.setAttribute("aria-valuetext", name);
     btn.setAttribute("aria-label", "Alignment: " + name); btn.classList.toggle("set", !!ALIGN);
     let g = '<rect x="4" y="4" width="16" height="16" rx="2.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.33 4.5v15M14.67 4.5v15M4.5 9.33h15M4.5 14.67h15" stroke="currentColor" stroke-width="1.1" opacity=".4"/>';
@@ -1555,7 +1556,7 @@ rollAllBtn.addEventListener("click", e => {
   }
   let open = false, closeT = null;
   function openDrawer(){
-    if (open) return; open = true; scrim.hidden = false; drawer.hidden = false; drawer.style.transform = "";
+    if (open) return; open = true; scrim.hidden = false; drawer.hidden = false; drawer.style.transform = ""; show();
     if (!reduce) { drawer.animate([{ transform: "translateY(calc(100% + 60px))" }, { transform: "none" }], { duration: 320, easing: "cubic-bezier(.2,.9,.3,1)" }); scrim.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220 }); }
     pad.focus({ preventScroll: true });
   }
