@@ -540,7 +540,7 @@ function render(){
     const lit = !busy && s.fate;
     const mk = r.el.querySelector(".amark"), showMark = !busy && !!s.cell;
     if (showMark !== mk.classList.contains("on") || (showMark && mk.dataset.c !== s.cell)) { mk.classList.toggle("on", showMark); mk.dataset.c = s.cell || ""; mk.style.background = showMark ? CELL_COLOUR[s.cell] : ""; }
-    mk.dataset.name = s.cell ? CELL_NAME[s.cell] : s.fate ? (s.fate === "legend" ? "Nat 20" : "Nat 1") : "Any";
+    mk.dataset.name = s.cell ? CELL_NAME[s.cell] : "Any";
         r.fate.textContent = busy || !s.fate ? "" : s.fate === "legend" ? "· nat 20" : "· nat 1";
     r.lock.setAttribute("aria-pressed", s.kept ? "true" : "false");
     if (busy) { if (r.text.dataset.busy !== "1") { r.text.dataset.busy = "1"; r.text.innerHTML = '<span class="dots" aria-label="Rolling"><i></i><i></i><i></i></span>'; } }
@@ -1077,7 +1077,7 @@ function assign(i){
   if (s.value === 20) { s.fate = "legend"; s.text = LEGEND[cat][Math.floor(Math.random() * LEGEND[cat].length)]; }
   else if (s.value === 1) { s.fate = "curse"; s.text = CURSED[cat][Math.floor(Math.random() * CURSED[cat].length)]; }
   else { s.fate = null; const p = poolFor(cat); s.text = p[(s.value - 1) % p.length]; }
-  s.cell = s.fate ? null : cellKey();   // which alignment this line came from, if any
+  s.cell = cellKey();   // the alignment this was rolled under, if any
   rows[i].el.classList.remove("cursed");
   newEmblem(i);
 }
