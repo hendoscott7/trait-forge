@@ -510,7 +510,9 @@ const rows = CATS.map((cat, i) => {
   lock.addEventListener("click", e => {
     e.stopPropagation();
     if (rolling.has(i)) return;
+    const wasSkin = state[i].skin, curKey = ALIGN ? ALIGN.law + "," + ALIGN.moral : null;
     state[i].kept = !state[i].kept;
+    if (!state[i].kept && Dice && (wasSkin || null) !== curKey) { const pp = Dice.pos(i); poof(pp.x, pp.y, pp.r, curKey ? CELL_COLOUR[curKey] : document.documentElement.dataset.mode === "dark" ? "#e2d6bb" : "#2a2a2e"); }
     // a locked die keeps the alignment it was rolled under (none means it follows the page)
     state[i].skin = state[i].kept && ALIGN ? ALIGN.law + "," + ALIGN.moral : null;
     buzz(8);
@@ -1251,6 +1253,18 @@ function sparks(x, y, r){
   }
   runParticles();
 }
+// a puff of coloured smoke: a die changing its skin, or a locked one holding its own
+function poof(x, y, r, hex, small){
+  if (reduce) return;
+  ensureSparkCanvas();
+  const n = parseInt(hex.slice(1), 16), c = ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + (n & 255);
+  const count = small ? 10 : 20;
+  for (let k = 0; k < count; k++) {
+    const a = k / count * Math.PI * 2 + Math.random() * .4, sp = (small ? 40 : 90) + Math.random() * (small ? 40 : 110);
+    sparkList.push({ puff: true, c, x: x + Math.cos(a) * r * .5, y: y + Math.sin(a) * r * .4, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp * .7, r: r * (small ? .28 : .38) * (.7 + Math.random() * .5), life: 0, max: (small ? .55 : .8) + Math.random() * .35 });
+  }
+  runParticles();
+}
 // a blow knocks loose a puff of grit: short, low, the colour of the ink
 function grit(x, y, n, power){
   if (reduce) return;
@@ -1271,8 +1285,15 @@ function runParticles(){
     for (let k = sparkList.length - 1; k >= 0; k--) {
       const p = sparkList[k]; p.life += dt;
       if (p.life >= p.max) { sparkList.splice(k, 1); continue; }
-      p.vy += (p.ink ? 900 : 520) * dt; p.vx *= .97; p.x += p.vx * dt; p.y += p.vy * dt;
       const f = 1 - p.life / p.max;
+      if (p.puff) {
+        p.vx *= .9; p.vy = p.vy * .9 - 30 * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+        const r = p.r * (1 + 1.6 * (1 - f)), g = sparkCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+        g.addColorStop(0, "rgba(" + p.c + "," + (.62 * f) + ")"); g.addColorStop(.55, "rgba(" + p.c + "," + (.3 * f) + ")"); g.addColorStop(1, "rgba(" + p.c + ",0)");
+        sparkCtx.globalCompositeOperation = "source-over"; sparkCtx.fillStyle = g; sparkCtx.beginPath(); sparkCtx.arc(p.x, p.y, r, 0, Math.PI * 2); sparkCtx.fill();
+        continue;
+      }
+      p.vy += (p.ink ? 900 : 520) * dt; p.vx *= .97; p.x += p.vx * dt; p.y += p.vy * dt;
       if (p.ink) {
         sparkCtx.globalCompositeOperation = "source-over"; sparkCtx.fillStyle = "rgba(" + ink + "," + (f * .7) + ")";
         sparkCtx.fillRect(p.x, p.y, p.s, p.s);
@@ -1563,20 +1584,33 @@ rollAllBtn.addEventListener("click", e => {
     if (ALIGN) { const c = 1 - ALIGN.law, r = 1 - ALIGN.moral; g += '<rect x="' + (4.6 + c * 5.33) + '" y="' + (4.6 + r * 5.33) + '" width="4.13" height="4.13" rx=".8" fill="currentColor"/>'; }
     mini.innerHTML = g;
     try { localStorage.setItem("tf-align", JSON.stringify(ALIGN)); } catch (e) {}
-    if (Dice) Dice.paint();
+    if (Dice && !open) Dice.paint();   // while the sheet is open the dice wait, and change when it closes
     hellfire(!!ALIGN && ALIGN.law === -1 && ALIGN.moral === -1);
     grace(!!ALIGN && ALIGN.law === 1 && ALIGN.moral === 1);
   }
-  let open = false, closeT = null;
+  let open = false, closeT = null, openKey = null;
   function openDrawer(){
-    if (open) return; open = true; scrim.hidden = false; drawer.hidden = false; drawer.style.transform = ""; show();
+    if (open) return; open = true; openKey = ALIGN ? ALIGN.law + "," + ALIGN.moral : null; scrim.hidden = false; drawer.hidden = false; drawer.style.transform = ""; show();
     const ch = pad.parentNode; if (!reduce) { ch.classList.remove("intro"); void ch.offsetWidth; ch.classList.add("intro"); setTimeout(() => ch.classList.remove("intro"), 1000); }
     if (!reduce) { drawer.animate([{ transform: "translateY(calc(100% + 60px))" }, { transform: "none" }], { duration: 320, easing: "cubic-bezier(.2,.9,.3,1)" }); scrim.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220 }); }
     pad.focus({ preventScroll: true });
   }
   function closeDrawer(){
     if (!open) return; open = false; clearTimeout(closeT);
-    const done = () => { drawer.hidden = true; scrim.hidden = true; drawer.style.transform = ""; };
+    const now = ALIGN ? ALIGN.law + "," + ALIGN.moral : null, changed = now !== openKey;
+    const done = () => {
+      drawer.hidden = true; scrim.hidden = true; drawer.style.transform = "";
+      if (!Dice) return;
+      if (changed) state.forEach((s, i) => {
+        const p = Dice.pos(i);
+        if (!s.kept) poof(p.x, p.y, p.r, now ? CELL_COLOUR[now] : document.documentElement.dataset.mode === "dark" ? "#e2d6bb" : "#2a2a2e");
+        else {   // a locked die holds its colour: a small puff of its own and a pulse on its dot
+          poof(p.x, p.y, p.r, s.skin ? CELL_COLOUR[s.skin] : "#888888", true);
+          const mk = rows[i].el.querySelector(".amark"); if (!reduce) mk.animate([{ transform: "scale(1)" }, { transform: "scale(1.9)" }, { transform: "scale(1)" }], { duration: 520, easing: "cubic-bezier(.2,.9,.3,1)" });
+        }
+      });
+      Dice.paint();
+    };
     if (reduce) return done();
     drawer.animate([{ transform: drawer.style.transform || "none" }, { transform: "translateY(calc(100% + 60px))" }], { duration: 240, easing: "cubic-bezier(.4,0,.8,.4)" }).onfinish = done;
     scrim.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 240 });
