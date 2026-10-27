@@ -1258,9 +1258,9 @@ function poof(x, y, r, hex, small){
   if (reduce) return;
   ensureSparkCanvas();
   const n = parseInt(hex.slice(1), 16), c = ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + (n & 255);
-  const count = small ? 10 : 20;
+  const count = small ? 0 : 9;
   for (let k = 0; k < count; k++) {
-    const a = k / count * Math.PI * 2 + Math.random() * .4, sp = (small ? 40 : 90) + Math.random() * (small ? 40 : 110);
+    const a = k / count * Math.PI * 2 + Math.random() * .4, sp = 35 + Math.random() * 45;
     sparkList.push({ puff: true, c, x: x + Math.cos(a) * r * .5, y: y + Math.sin(a) * r * .4, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp * .7, r: r * (small ? .28 : .38) * (.7 + Math.random() * .5), life: 0, max: (small ? .55 : .8) + Math.random() * .35 });
   }
   runParticles();
@@ -1289,7 +1289,7 @@ function runParticles(){
       if (p.puff) {
         p.vx *= .9; p.vy = p.vy * .9 - 30 * dt; p.x += p.vx * dt; p.y += p.vy * dt;
         const r = p.r * (1 + 1.6 * (1 - f)), g = sparkCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
-        g.addColorStop(0, "rgba(" + p.c + "," + (.62 * f) + ")"); g.addColorStop(.55, "rgba(" + p.c + "," + (.3 * f) + ")"); g.addColorStop(1, "rgba(" + p.c + ",0)");
+        g.addColorStop(0, "rgba(" + p.c + "," + (.34 * f) + ")"); g.addColorStop(1, "rgba(" + p.c + ",0)");
         sparkCtx.globalCompositeOperation = "source-over"; sparkCtx.fillStyle = g; sparkCtx.beginPath(); sparkCtx.arc(p.x, p.y, r, 0, Math.PI * 2); sparkCtx.fill();
         continue;
       }
@@ -1606,7 +1606,7 @@ rollAllBtn.addEventListener("click", e => {
         if (!s.kept) poof(p.x, p.y, p.r, now ? CELL_COLOUR[now] : document.documentElement.dataset.mode === "dark" ? "#e2d6bb" : "#2a2a2e");
         else {   // a locked die holds its colour: a small puff of its own and a pulse on its dot
           poof(p.x, p.y, p.r, s.skin ? CELL_COLOUR[s.skin] : "#888888", true);
-          const mk = rows[i].el.querySelector(".amark"); if (!reduce) mk.animate([{ transform: "scale(1)" }, { transform: "scale(1.9)" }, { transform: "scale(1)" }], { duration: 520, easing: "cubic-bezier(.2,.9,.3,1)" });
+          const mk = rows[i].el.querySelector(".amark"); if (!reduce) mk.animate([{ transform: "scale(1)" }, { transform: "scale(1.5)" }, { transform: "scale(1)" }], { duration: 480, easing: "cubic-bezier(.2,.9,.3,1)" });
         }
       });
       Dice.paint();
