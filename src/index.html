@@ -66,6 +66,23 @@ body{
 .amark::before{content:""; position:absolute; inset:-11px}
 .amark::after{content:attr(data-name); position:absolute; left:50%; bottom:calc(100% + 7px); transform:translate(-50%, 3px); white-space:nowrap; font-family:"IM Fell English", Georgia, serif; font-size:.8rem; letter-spacing:0; text-transform:none; line-height:1; padding:4px 8px 5px; border-radius:6px; background:var(--ink); color:var(--paper); opacity:0; pointer-events:none; transition:opacity .15s, transform .2s ease}
 .amark:hover::after, .amark.peek::after{opacity:1; transform:translate(-50%, 0)}
+/* a trait you can copy: the torn slip shows faintly behind it on hover, a touch more on press */
+@media (hover:hover){ .trait:not(.kept):not(.rolling):not(.copied) .body:has(.text:hover)::before{opacity:.3; transform:rotate(-.7deg); transition:opacity .25s ease, transform .3s} }
+.trait:not(.kept):not(.rolling):not(.copied) .body:has(.text:active)::before{opacity:.45; transform:rotate(-.7deg); transition:opacity .06s}
+/* an emblem you can tap to reroll lifts slightly off the paper on hover */
+@media (hover:hover){
+  .trait:not(.kept):not(.rolling) .tile{transition:transform .25s ease, filter .3s ease}
+  .trait:not(.kept):not(.rolling):not(.legend):not(.curse) .tile:hover{transform:translateY(-2px); filter:drop-shadow(0 4px 5px rgba(0,0,0,.22))}
+  .trait.legend:not(.kept):not(.rolling) .tile:hover, .trait.curse:not(.kept):not(.rolling) .tile:hover{transform:translateY(-2px)}
+}
+/* circle buttons: on hover the ring darkens a shade and a faint wash fills it */
+@media (hover:hover){
+  .corner::before, .align::before, .trait:not(.kept) .lock::before{transition:border-color .2s ease, background-color .2s ease, transform .18s cubic-bezier(.2,1.5,.4,1)}
+  .corner:hover::before, .align:hover::before, .trait:not(.kept) .lock:hover::before{border-color:var(--mute); background-color:color-mix(in srgb, var(--ink) 5%, transparent)}
+  .corner:hover, .align:hover, .trait:not(.kept) .lock:hover{color:var(--ink)}
+  .dclose::before{transition:transform .2s ease}
+  .dclose:hover::before{transform:scale(1.06)}
+}
 .floorline{position:fixed; left:0; right:0; bottom:var(--foot); height:0; pointer-events:none}
 .sheet::before{content:none}
 .sheet::after{content:""; position:absolute; inset:0; mix-blend-mode:multiply; opacity:.6;
