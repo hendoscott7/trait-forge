@@ -1579,6 +1579,16 @@ rollAllBtn.addEventListener("click", e => {
   roll(free());
 });
 
+// space bar rolls every unlocked die, unless the alignment sheet is open or a control has focus
+document.addEventListener("keydown", e => {
+  if (e.code !== "Space" && e.key !== " ") return;
+  if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (!document.getElementById("drawer").hidden) return;
+  if (e.target.closest && e.target.closest("button, input, textarea, [role=button], [role=slider]")) return;
+  e.preventDefault();
+  if (state.every(s => s.kept)) return;
+  rollAllBtn.click();
+});
 /* ---------- alignment: a dot chart in a sheet from the bottom ---------- */
 (function alignDrawer(){
   const btn = document.getElementById("alignBtn"), mini = btn.querySelector(".mini"), drawer = document.getElementById("drawer"), scrim = document.getElementById("scrim");
